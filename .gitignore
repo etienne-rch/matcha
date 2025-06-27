@@ -1,0 +1,55 @@
+# Node
+node_modules/
+dist/
+*.log
+
+# Turbo
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Yarn
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.yarnrc.yml
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Tests / Coverage
+coverage/
+jest-test-results.json
+
+# Expo
+.expo/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# macOS / OS
+.DS_Store
+Thumbs.db
+*.pem
+
+# IDE
+.vscode/
+.idea/
+
+# Local env
+.env
+.env*.local

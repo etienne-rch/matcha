@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop1
+  pull_request:
+    branches:
+      - main
+      - develop1
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    outputs:
+      turbo-cache-hit: ${{ steps.turbo-cache.outputs.cache-hit }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Cache Yarn install
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Cache Turbo
+        id: turbo-cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+  api:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Restore Yarn install
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Lint API
+        run: yarn workspace matcha-api run lint
+
+      - name: Test API
+        run: yarn workspace matcha-api run test
+
+      - name: Build API
+        run: yarn workspace matcha-api run build
+
+  app:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Restore Yarn install
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Lint App
+        run: yarn workspace matcha-app run lint
+
+      - name: Test App
+        run: yarn workspace matcha-app run test
+
+      - name: Type Check
+        run: yarn workspace matcha-app run tsc --noEmit
+
+      - name: Build App
+        run: yarn workspace matcha-app run build || echo "No build step"

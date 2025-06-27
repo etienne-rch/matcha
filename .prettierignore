@@ -1,0 +1,26 @@
+# Dépendances
+node_modules
+
+# Build
+dist
+build
+coverage
+
+# Environnements
+.env
+.env.*.local
+
+# CI/CD
+.husky/_/
+.github/
+
+# Snapshots
+*.snap
+
+# Configs générées
+yarn.lock
+package-lock.json
+tsconfig.tsbuildinfo
+
+# Système
+.DS_Store

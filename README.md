@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Matcha
 
 Ce projet utilise **Turborepo** pour gérer efficacement plusieurs packages dans un seul dépôt.

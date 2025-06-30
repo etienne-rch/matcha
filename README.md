@@ -89,7 +89,3 @@ Le monorepo utilise **une seule configuration GitHub Actions à la racine** (`.g
 ## Crédit
 
 Projet développé par Brenda, Amanda, Erwan, Sonia, Ziwei et Etienne dans le cadre du Master ETNA.
-
-
-
-TESTUSER

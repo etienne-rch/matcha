@@ -26,6 +26,7 @@ export default {
     },
     web: {
       favicon: './assets/favicon.png',
+      bundler: "metro",
     },
     extra: {
       FIREBASE_API_KEY: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,

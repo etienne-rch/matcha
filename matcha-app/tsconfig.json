@@ -12,10 +12,20 @@
     "skipLibCheck": true,
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": [
+        "*"
+      ]
     }
   },
-  "include": ["src", "index.ts"],
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js"],
+  "include": [
+    "src",
+    "index.ts",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js"
+  ],
   "extends": "expo/tsconfig.base"
 }

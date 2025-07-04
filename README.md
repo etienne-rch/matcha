@@ -37,6 +37,29 @@ yarn install
 yarn dev
 ```
 
+### Lancer matcha-api sur Docker
+
+Dans le dossier matcha-api
+
+- docker compose build
+- docker compose up
+  Cela démarre :
+  le conteneur de matcha-api (Node.js / Express / TypeScript)
+  le conteneur MongoDB (mongo:6)
+  avec un volume data/mongo pour persister la base
+
+# arrêter proprement les conteneurs
+
+docker compose down
+
+# supprimer le volume de données (ATTENTION : perte totale des données)
+
+docker volume rm data/mongo
+
+# relancer le conteneur
+
+docker compose up -d
+
 Cela exécute en parallèle :
 
 - `matcha-api` avec `ts-node-dev`

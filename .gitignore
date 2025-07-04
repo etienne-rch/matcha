@@ -53,3 +53,6 @@ Thumbs.db
 # Local env
 .env
 .env*.local
+
+# ignorer la base Mongo
+/data/mongo

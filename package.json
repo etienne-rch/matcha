@@ -18,16 +18,16 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
-    "husky": "^9.1.7",
-    "prettier": "^3.6.2",
-    "turbo": "2.5.4",
     "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-import-resolver-typescript": "^4.4.3",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-native": "^5.0.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-import-resolver-typescript": "^4.4.3",
-    "lint-staged": "^16.1.0"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0",
+    "prettier": "^3.6.2",
+    "turbo": "2.5.4"
   },
   "lint-staged": {
     "matcha-app/**/*.{ts,tsx}": [
@@ -40,5 +40,8 @@
       "prettier --write"
     ]
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.19",
+  "dependencies": {
+    "json5": "^2.2.3"
+  }
 }

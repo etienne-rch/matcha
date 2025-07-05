@@ -59,11 +59,11 @@ const UserSchema = new Schema(
     addressCountry: String,
 
     isEmailVerified: { type: Boolean, default: false },
-    emailValidationToken: String,
-    emailValidationSentAt: Date,
+    emailVerificationToken: String,
+    emailVerificationTokenExpires: Date,
   },
   {
-    timestamps: true, // auto add createdAt / updatedAt
+    timestamps: true,
   },
 );
 

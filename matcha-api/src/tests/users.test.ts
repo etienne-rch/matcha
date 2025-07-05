@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
@@ -6,10 +7,10 @@ import User from '@/models/User';
 
 describe('POST /users', () => {
   const basePayload = {
-    email: 'john.doe@example.com',
-    password: 'SuperSecret123',
-    firstName: 'John',
-    lastName: 'Doe',
+    email: 'alice@example.com',
+    password: 'SuperPass1!',
+    firstName: 'Alice',
+    lastName: 'Test',
     consentAccepted: true,
   };
 
@@ -17,7 +18,10 @@ describe('POST /users', () => {
     const res = await request(app).post('/users').send(basePayload);
 
     expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty('message', 'User created successfully');
+    expect(res.body).toHaveProperty(
+      'message',
+      'User created successfully. Please check your email to verify your account.',
+    );
     expect(res.body).toHaveProperty('userId');
 
     const userInDB = await User.findOne({ email: basePayload.email });
@@ -105,5 +109,59 @@ describe('GET /users/:id', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('message', 'Invalid user ID');
+  });
+});
+
+describe('GET /users/verify-email', () => {
+  let token: string;
+
+  beforeEach(async () => {
+    token = crypto.randomBytes(32).toString('hex');
+  });
+
+  it('should verify email with a valid token', async () => {
+    const user = await User.create({
+      email: 'test@example.com',
+      passwordHash: 'hashed',
+      consentAccepted: true,
+      emailVerificationToken: token,
+      emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000), // 1h
+    });
+
+    const res = await request(app).get(`/users/verify-email?token=${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Email successfully verified');
+
+    const updatedUser = await User.findById(user._id);
+    expect(updatedUser?.isEmailVerified).toBe(true);
+    expect(updatedUser?.emailVerificationToken).toBeUndefined();
+    expect(updatedUser?.emailVerificationTokenExpires).toBeUndefined();
+  });
+
+  it('should return 400 for missing token', async () => {
+    const res = await request(app).get('/users/verify-email');
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Invalid or missing token');
+  });
+
+  it('should return 400 for invalid token', async () => {
+    const res = await request(app).get('/users/verify-email?token=invalid');
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Invalid or expired token');
+  });
+
+  it('should return 400 for expired token', async () => {
+    await User.create({
+      email: 'expired@example.com',
+      passwordHash: 'hashed',
+      consentAccepted: true,
+      emailVerificationToken: token,
+      emailVerificationTokenExpires: new Date(Date.now() - 3600 * 1000), // expired
+    });
+
+    const res = await request(app).get(`/users/verify-email?token=${token}`);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe('Invalid or expired token');
   });
 });

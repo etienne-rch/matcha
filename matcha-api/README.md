@@ -7,7 +7,8 @@
 ## Fonctionnalités
 
 - Architecture claire et modulaire
-- Connexion à MongoDB Atlas via le driver natif `mongodb`
+- Connexion à MongoDB via 'mongoose'
+- Support Docker pour MongoDB local (volume data/mongo)
 - Schémas de validation avec `zod`
 - Linting & formatage avec ESLint + Prettier
 - Tri automatique des imports (Prettier plugin)
@@ -54,7 +55,7 @@ Fichier `.env` :
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/matcha?retryWrites=true&w=majority
+MONGODB_URI=mongodb://mongo:27017/matcha
 APP_NAME=matcha-api
 NODE_ENV=development
 ```
@@ -78,6 +79,8 @@ matcha-api/
 │   └── index.ts         # Point d’entrée : DB + server
 ├── .env
 ├── .env.example
+├── docker-compose.yml
+├── Dockerfile
 ├── eslint.config.js
 ├── prettier.config.cjs
 ├── .gitignore
@@ -97,6 +100,7 @@ matcha-api/
 - **Services** = couche métier, appel au driver `mongodb`.
 - **Validations** faites dans `models/` avec `zod`.
 - **Middlewares** = réutilisables, testables, sans effet de bord.
+- **data/mongo** = est un volume Docker permettant de stocker durablement les données MongoDB sur la machine hôte, même en cas de redémarrage du conteneur.
 
 ### 🧠 Nommage & code
 

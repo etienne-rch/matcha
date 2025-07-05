@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_dev
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: matcha_dev
+
+  api:
+    build:
+      context: .
+      dockerfile: matcha-api/Dockerfile
+    container_name: matcha_api
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+    working_dir: /app/matcha-api
+    command: yarn dev
+    depends_on:
+      - mongo
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: matcha_dev
+
+volumes:
+  mongo_data:

@@ -1,27 +1,53 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, Types, model } from 'mongoose';
 
-const TrainingSchema = new Schema({
-    externalId: String,
-    source: String,
-    isActive: Boolean,
+const TrainingSchema = new Schema(
+  {
+    externalId: { type: String, trim: true },
+    source: { type: String, trim: true }, // ex: "OpenClassrooms", "MonCompteFormation"
+
+    isActive: { type: Boolean, default: true },
     lastSyncedAt: Date,
-    title: String,
-    provider: String,
-    link: String,
-    cost: Number,
-    cpfEligible: Boolean,
-    relatedJobIds: [{ type: Types.ObjectId, ref: "Job" }],
-    durationWeeks: Number,
-    modality: String,
-    location: {
-      type: { type: String, enum: ["Point"], default: "Point" },
-      coordinates: { type: [Number], default: [0, 0] },
+
+    title: { type: String, required: true, trim: true },
+    provider: { type: String, trim: true },
+    link: { type: String, trim: true },
+
+    cost: { type: Number, min: 0 },
+    cpfEligible: { type: Boolean, default: false },
+
+    relatedJobIds: [{ type: Types.ObjectId, ref: 'Job' }],
+
+    durationWeeks: { type: Number, min: 0 },
+
+    modality: {
+      type: String,
+      enum: ['online', 'in-person', 'hybrid'],
+      default: 'online',
     },
-    addressCity: String,
-    addressPostalCode: String,
-    addressCountry: String,
-    createdAt: Date,
-    updatedAt: Date,
-  });
-  
-  export default model("Training", TrainingSchema);
+
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+        required: true,
+      },
+      coordinates: {
+        type: [Number], // [lng, lat]
+        default: [0, 0],
+        required: true,
+      },
+    },
+
+    addressCity: { type: String, trim: true },
+    addressPostalCode: { type: String, trim: true },
+    addressCountry: { type: String, trim: true },
+  },
+  {
+    timestamps: true, // auto add createdAt / updatedAt
+  },
+);
+
+TrainingSchema.index({ location: '2dsphere' });
+
+export default model('Training', TrainingSchema);

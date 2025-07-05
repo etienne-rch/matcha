@@ -1,16 +1,54 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, Types, model } from 'mongoose';
 
-const CvParsingSchema = new Schema({
-    userId: { type: Types.ObjectId, ref: "User" },
-    fileUrl: String,
-    rawText: String,
-    modelUsed: String,
-    consentGiven: Boolean,
-    extractedSkills: [String],
-    extractedExperiences: [String],
-    extractedEducations: [String],
-    createdAt: Date,
-    updatedAt: Date,
-  });
-  
-export default model("CvParsing", CvParsingSchema);
+const CvParsingSchema = new Schema(
+  {
+    userId: {
+      type: Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+
+    fileUrl: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    rawText: {
+      type: String,
+      required: true,
+    },
+
+    modelUsed: {
+      type: String,
+      trim: true,
+      default: 'undefined',
+    },
+
+    consentGiven: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    extractedSkills: {
+      type: [String],
+      default: [],
+    },
+
+    extractedExperiences: {
+      type: [String],
+      default: [],
+    },
+
+    extractedEducations: {
+      type: [String],
+      default: [],
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export default model('CvParsing', CvParsingSchema);

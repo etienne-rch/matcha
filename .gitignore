@@ -54,5 +54,5 @@ Thumbs.db
 .env
 .env*.local
 
-# ignorer la base Mongo
-/data/mongo
+# Mongo
+*/data/mongo

@@ -1,13 +1,38 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, Types, model } from 'mongoose';
 
-const PersonalityTestSchema = new Schema({
-    userId: { type: Types.ObjectId, ref: "User" },
-    type: String,
-    result: String,
-    traits: [String],
-    motivationProfile: [String],
-    createdAt: Date,
-    updatedAt: Date,
-  });
+const PersonalityTestSchema = new Schema(
+  {
+    userId: {
+      type: Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
 
-export default model("PersonalityTest", PersonalityTestSchema);
+    type: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    result: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    traits: {
+      type: [String],
+      default: [],
+    },
+
+    motivationProfile: {
+      type: [String],
+      default: [],
+    },
+  },
+  {
+    timestamps: true, // auto-add createdAt / updatedAt
+  },
+);
+
+export default model('PersonalityTest', PersonalityTestSchema);

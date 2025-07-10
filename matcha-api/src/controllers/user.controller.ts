@@ -5,13 +5,16 @@ import mongoose from 'mongoose';
 
 import User from '@/models/User';
 import { sendValidationEmail } from '@/services/email';
+import { UserRegisterInput } from '@/types/user';
 
 export const createUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const { email, password, firstName, lastName, consentAccepted } = req.body;
+    const input: UserRegisterInput = req.body;
+
+    const { email, password, firstName, lastName, consentAccepted } = input;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {

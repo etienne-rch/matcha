@@ -13,6 +13,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~5.0.4",
     "@ladle/react": "^5.0.3",
     "axios": "^1.9.0",
     "expo": "~53.0.11",
@@ -24,7 +25,8 @@
     "react-native-paper": "^5.14.5",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "^5.5.1",
-    "react-native-svg": "^15.12.0"
+    "react-native-svg": "^15.12.0",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

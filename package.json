@@ -30,11 +30,8 @@
     "turbo": "2.5.4"
   },
   "lint-staged": {
-    "matcha-app/**/*.{ts,tsx}": [
-      "cd matcha-app && eslint . --ext .ts,.tsx --fix"
-    ],
-    "matcha-api/**/*.{ts,tsx}": [
-      "cd matcha-api && eslint . --ext .ts,.tsx --fix"
+    "**/src/**/*.{ts,tsx}": [
+      "eslint --fix"
     ],
     "**/*.{json,md}": [
       "prettier --write"

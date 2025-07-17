@@ -1,23 +1,16 @@
-import { Text, View } from 'react-native';
-import { DefaultTheme, PaperProvider } from 'react-native-paper';
-import '../global.css';
+import * as React from 'react';
+import { View } from 'react-native';
+import { PaperProvider } from 'react-native-paper';
 
-const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '',
-    secondary: 'yellow',
-  },
-};
+import rnpTheme from '@/theme/rnpTheme';
+
+import { Branding } from '../assets';
 
 export default function App() {
   return (
-    <PaperProvider theme={theme}>
-      <View className="flex-1 items-center justify-center bg-green-white">
-        <Text className="text-xl font-bold" style={{color: theme.colors.primary}}>
-          Welcome to Matcha!
-        </Text>
+    <PaperProvider theme={rnpTheme}>
+      <View style={rnpTheme.styles.container}>
+        <Branding.Logo />
       </View>
     </PaperProvider>
   );

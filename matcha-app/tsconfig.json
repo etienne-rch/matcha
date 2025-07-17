@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["./types", "./node_modules/@types"],
     "target": "ES2020",
     "module": "ESNext",
     "jsx": "react-native",
@@ -12,20 +13,10 @@
     "skipLibCheck": true,
     "baseUrl": "src",
     "paths": {
-      "@/*": [
-        "*"
-      ]
+      "@/*": ["*"]
     }
   },
-  "include": [
-    "src",
-    "index.ts",
-    "nativewind-env.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "babel.config.js",
-    "metro.config.js"
-  ],
+  "include": ["src", "index.ts"],
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js"],
   "extends": "expo/tsconfig.base"
 }

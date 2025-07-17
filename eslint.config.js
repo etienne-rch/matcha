@@ -4,7 +4,7 @@ const importPlugin = require('eslint-plugin-import');
 const reactPlugin = require('eslint-plugin-react');
 const reactNativePlugin = require('eslint-plugin-react-native');
 
-const projectName = 'app'; // or whatever your project name is
+const projectName = 'app';
 
 module.exports = [
   {

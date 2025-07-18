@@ -4,9 +4,10 @@ const importPlugin = require('eslint-plugin-import');
 const reactPlugin = require('eslint-plugin-react');
 const reactNativePlugin = require('eslint-plugin-react-native');
 
-const projectName = 'app';
-
-module.exports = [
+/**
+ * Shared ESLint config for matcha monorepo
+ */
+module.exports = (projectName) => [
   {
     ignores: ['dist', 'node_modules', 'build'],
   },

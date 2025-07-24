@@ -4,7 +4,7 @@ import TabNavigator from '@/navigation/TabNavigator';
 import LoginScreen from '@/screens/Login/LoginScreen';
 
 export default function AppNavigator() {
-  const user = false;
+  const user = true;
 
   return (
     <NavigationContainer>

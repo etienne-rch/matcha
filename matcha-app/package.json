@@ -1,6 +1,7 @@
 {
   "name": "matcha-app",
   "version": "1.0.0",
+  "type": "commonjs",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",

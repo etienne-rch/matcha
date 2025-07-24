@@ -1,5 +1,6 @@
 {
   "name": "matcha-monorepo",
+  "type": "commonjs",
   "private": true,
   "workspaces": [
     "matcha-app",
@@ -30,13 +31,11 @@
     "turbo": "2.5.4"
   },
   "lint-staged": {
-    "matcha-app/**/*.{ts,tsx}": [
-      "cd matcha-app && eslint . --ext .ts,.tsx --fix"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
     ],
-    "matcha-api/**/*.{ts,tsx}": [
-      "cd matcha-api && eslint . --ext .ts,.tsx --fix"
-    ],
-    "**/*.{json,md}": [
+    "*.{json, md}": [
       "prettier --write"
     ]
   },

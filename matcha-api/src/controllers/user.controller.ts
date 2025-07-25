@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import mongoose from 'mongoose';
 
 import User from '@/models/User';
 import { sendValidationEmail } from '@/services/email';
+import { userUpdateSchema } from '@/validators/user.validator';
 
 export const createUser = async (
   req: Request,
@@ -105,5 +106,53 @@ export const verifyEmail = async (
   } catch (error) {
     console.error('Error verifying email:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const updateUser: RequestHandler = async (req, res) => {
+  const userId = req.params.id;
+
+  if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+    res
+      .status(400)
+      .json({ message: 'ID invalide (attendu: ObjectId MongoDB)' });
+    return;
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: 'Utilisateur non trouvé' });
+      return;
+    }
+    const updatableFields = Object.keys(userUpdateSchema.shape);
+
+    for (const field of updatableFields) {
+      if (req.body[field] !== undefined) {
+        if (field === 'password') {
+          // Si mot de passe transmis, on le hash dans `passwordHash`
+          const hashed = await bcrypt.hash(req.body.password, 10);
+          user.passwordHash = hashed;
+        } else {
+          (user as any)[field] = req.body[field];
+        }
+      }
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profil mis à jour avec succès',
+      user: {
+        ...user.toObject(),
+        passwordHash: undefined, // sécurité : on ne retourne pas le hash
+        __v: undefined, // optionnel : on masque d'autres métadonnées internes
+      },
+    });
+    return;
+  } catch (error) {
+    console.error('[updateUser]', error);
+    res.status(500).json({ message: 'Erreur serveur', error });
+    return;
   }
 };

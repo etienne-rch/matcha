@@ -5,7 +5,7 @@ import request from 'supertest';
 import app from '@/app';
 import User from '@/models/User';
 
-describe('POST /users', () => {
+describe('POST /api/users', () => {
   const basePayload = {
     email: 'alice@example.com',
     password: 'SuperPass1!',
@@ -15,7 +15,7 @@ describe('POST /users', () => {
   };
 
   it('should create a user successfully', async () => {
-    const res = await request(app).post('/users').send(basePayload);
+    const res = await request(app).post('/api/users').send(basePayload);
 
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty(
@@ -31,7 +31,7 @@ describe('POST /users', () => {
   it('should not create a user with missing required fields', async () => {
     const { email, ...incompletePayload } = basePayload;
 
-    const res = await request(app).post('/users').send(incompletePayload);
+    const res = await request(app).post('/api/users').send(incompletePayload);
 
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toBe('Validation failed');
@@ -39,9 +39,9 @@ describe('POST /users', () => {
   });
 
   it('should not allow duplicate email', async () => {
-    await request(app).post('/users').send(basePayload);
+    await request(app).post('/api/users').send(basePayload);
 
-    const res = await request(app).post('/users').send(basePayload);
+    const res = await request(app).post('/api/users').send(basePayload);
 
     expect(res.statusCode).toBe(409);
     expect(res.body.message).toBe('User with this email already exists');
@@ -49,7 +49,7 @@ describe('POST /users', () => {
 
   it('should return 400 for invalid email', async () => {
     const res = await request(app)
-      .post('/users')
+      .post('/api/users')
       .send({
         ...basePayload,
         email: 'notanemail',
@@ -61,7 +61,7 @@ describe('POST /users', () => {
 
   it('should return 400 for short password', async () => {
     const res = await request(app)
-      .post('/users')
+      .post('/api/users')
       .send({
         ...basePayload,
         password: '123',
@@ -72,7 +72,7 @@ describe('POST /users', () => {
   });
 });
 
-describe('GET /users/:id', () => {
+describe('GET /api/users/:id', () => {
   let userId: string;
 
   beforeEach(async () => {
@@ -88,7 +88,7 @@ describe('GET /users/:id', () => {
   });
 
   it('should return a user when given a valid ID', async () => {
-    const res = await request(app).get(`/users/${userId}`);
+    const res = await request(app).get(`/api/users/${userId}`);
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('_id', userId);
@@ -98,21 +98,21 @@ describe('GET /users/:id', () => {
 
   it('should return 404 when user does not exist', async () => {
     const nonExistentId = new mongoose.Types.ObjectId();
-    const res = await request(app).get(`/users/${nonExistentId}`);
+    const res = await request(app).get(`/api/users/${nonExistentId}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toHaveProperty('message', 'User not found');
   });
 
   it('should return 400 for invalid MongoDB ID', async () => {
-    const res = await request(app).get('/users/invalid-id');
+    const res = await request(app).get('/api/users/invalid-id');
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('message', 'Invalid user ID');
   });
 });
 
-describe('GET /users/verify-email', () => {
+describe('GET /api/users/verify-email', () => {
   let token: string;
 
   beforeEach(async () => {
@@ -128,7 +128,9 @@ describe('GET /users/verify-email', () => {
       emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000), // 1h
     });
 
-    const res = await request(app).get(`/users/verify-email?token=${token}`);
+    const res = await request(app).get(
+      `/api/users/verify-email?token=${token}`,
+    );
 
     expect(res.status).toBe(200);
     expect(res.body.message).toBe('Email successfully verified');
@@ -140,13 +142,13 @@ describe('GET /users/verify-email', () => {
   });
 
   it('should return 400 for missing token', async () => {
-    const res = await request(app).get('/users/verify-email');
+    const res = await request(app).get('/api/users/verify-email');
     expect(res.status).toBe(400);
     expect(res.body.message).toBe('Invalid or missing token');
   });
 
   it('should return 400 for invalid token', async () => {
-    const res = await request(app).get('/users/verify-email?token=invalid');
+    const res = await request(app).get('/api/users/verify-email?token=invalid');
     expect(res.status).toBe(400);
     expect(res.body.message).toBe('Invalid or expired token');
   });
@@ -160,7 +162,9 @@ describe('GET /users/verify-email', () => {
       emailVerificationTokenExpires: new Date(Date.now() - 3600 * 1000), // expired
     });
 
-    const res = await request(app).get(`/users/verify-email?token=${token}`);
+    const res = await request(app).get(
+      `/api/users/verify-email?token=${token}`,
+    );
     expect(res.status).toBe(400);
     expect(res.body.message).toBe('Invalid or expired token');
   });

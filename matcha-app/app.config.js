@@ -6,11 +6,11 @@ export default {
     slug: 'matcha-app',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/icons/icon.png',
+    icon: './src/assets/icons/icon.png',
     userInterfaceStyle: 'light',
     newArchEnabled: true,
     splash: {
-      image: './assets/icons/splash-icon.png',
+      image: './src/assets/icons/splash-icon.png',
       resizeMode: 'contain',
       backgroundColor: '#ffffff',
     },
@@ -19,13 +19,13 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: './assets/icons/adaptive-icon.png',
+        foregroundImage: './src/assets/icons/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
       edgeToEdgeEnabled: true,
     },
     web: {
-      favicon: './assets/icons/favicon.png',
+      favicon: './src/assets/icons/favicon.png',
       bundler: 'metro',
     },
     extra: {

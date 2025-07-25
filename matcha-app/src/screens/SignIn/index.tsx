@@ -13,7 +13,7 @@ import TermsAndPrivacyText from '@/components/Texts/TermsAndPrivacyText';
 import { useModal } from '@/hooks/useModals';
 import { styles } from '@/themes/styles';
 
-export default function LoginScreen() {
+export default function SignInScreen() {
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
   const [email, setEmail] = useState('');

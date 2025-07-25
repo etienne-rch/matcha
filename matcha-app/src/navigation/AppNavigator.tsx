@@ -1,10 +1,10 @@
 import { NavigationContainer } from '@react-navigation/native';
 
 import TabNavigator from '@/navigation/TabNavigator';
-import LoginScreen from '@/screens/Login/LoginScreen';
+import LoginScreen from '@/screens/Login/index';
 
 export default function AppNavigator() {
-  const user = true;
+  const user = false;
 
   return (
     <NavigationContainer>

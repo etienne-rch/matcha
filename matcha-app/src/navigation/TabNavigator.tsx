@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import HomeScreen from '@/screens/Home/HomeScreen';
+import HomeScreen from '@/screens/Home/index';
 
 const Tab = createBottomTabNavigator();
 

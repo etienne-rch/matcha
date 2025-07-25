@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { View } from 'react-native';
 
-import rnpTheme from '@/theme/rnpTheme';
-
-import { Branding } from '../../../assets';
+import { Branding } from '@/assets';
+import { styles } from '@/themes/styles';
 
 export default function HomeScreen() {
   return (
-    <View style={rnpTheme.styles.container}>
+    <View style={styles.container}>
       <Branding.Logo />
     </View>
   );

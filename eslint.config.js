@@ -5,47 +5,35 @@ const reactPlugin = require('eslint-plugin-react');
 const reactNativePlugin = require('eslint-plugin-react-native');
 
 /**
- * Shared ESLint config for matcha monorepo
+ * Base ESLint config for matcha monorepo
  */
-module.exports = (projectName) => [
+const baseConfig = [
   {
-    ignores: ['dist', 'node_modules', 'build'],
+    ignores: ['**/dist/**', '**/node_modules/**', '**/build/**'],
   },
   {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       '@typescript-eslint': tseslint,
       import: importPlugin,
-      ...(projectName === 'app' && {
-        react: reactPlugin,
-        'react-native': reactNativePlugin,
-      }),
     },
     languageOptions: {
       parser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        ecmaFeatures: {
-          jsx: projectName === 'app',
-        },
       },
     },
     settings: {
-      ...(projectName === 'app' && {
-        react: { version: 'detect' },
-      }),
       'import/resolver': {
         typescript: {
-          project: `./tsconfig.json`,
+          project: './tsconfig.json',
         },
       },
     },
     rules: {
       'no-console': 'warn',
       '@typescript-eslint/no-unused-vars': ['warn'],
-      ...(projectName === 'app' && {
-        'react-native/no-inline-styles': 'warn',
-      }),
       'import/order': [
         'error',
         {
@@ -60,3 +48,5 @@ module.exports = (projectName) => [
     },
   },
 ];
+
+module.exports = baseConfig;

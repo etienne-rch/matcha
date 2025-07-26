@@ -7,7 +7,7 @@ export default function LoginLink() {
   return (
     <>
       <Text style={styles.loginText}>
-        Déjà inscrit? <Text style={styles.linkText}>Se connecter</Text>
+        Déjà inscrit ? <Text style={styles.linkText}>Se connecter</Text>
       </Text>
     </>
   );

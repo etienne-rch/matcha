@@ -13,13 +13,62 @@ import TermsAndPrivacyText from '@/components/Texts/TermsAndPrivacyText';
 import { useModal } from '@/hooks/useModals';
 import { styles } from '@/themes/styles';
 
-export default function SignInScreen() {
+export default function SigninScreen() {
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
+
+  const [errors, setErrors] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    motDePasse: '',
+  });
+
   const termsModal = useModal();
   const privacyModal = useModal();
+
+  const validateForm = () => {
+    let valid = true;
+    let newErrors = { nom: '', prenom: '', email: '', motDePasse: '' };
+
+    if (!nom.trim()) {
+      newErrors.nom = 'Le nom est requis';
+      valid = false;
+    }
+
+    if (!prenom.trim()) {
+      newErrors.prenom = 'Le prénom est requis';
+      valid = false;
+    }
+
+    if (!email.trim()) {
+      newErrors.email = 'L’email est requis';
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Format d’email invalide';
+      valid = false;
+    }
+
+    if (!motDePasse.trim()) {
+      newErrors.motDePasse = 'Le mot de passe est requis';
+      valid = false;
+    } else if (motDePasse.length < 6) {
+      newErrors.motDePasse = 'Minimum 6 caractères';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleRegister = () => {
+    if (validateForm()) {
+      console.log('Formulaire valide → Inscription...');
+      // Ici tu peux appeler ton API ou navigation
+    }
+  };
 
   return (
     <ScrollView
@@ -43,6 +92,7 @@ export default function SignInScreen() {
             setPrenom,
             setEmail,
             setMotDePasse,
+            errors,
           }}
         />
 
@@ -65,7 +115,7 @@ export default function SignInScreen() {
 
         <Button
           mode="contained"
-          onPress={() => console.log('Inscription')}
+          onPress={handleRegister}
           style={styles.continueButton}
         >
           Continuer

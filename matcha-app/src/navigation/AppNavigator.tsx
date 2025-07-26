@@ -1,14 +1,14 @@
 import { NavigationContainer } from '@react-navigation/native';
 
 import TabNavigator from '@/navigation/TabNavigator';
-import SignInScreen from '@/screens/SignIn';
+import SigninScreen from '@/screens/Signin';
 
 export default function AppNavigator() {
   const user = false;
 
   return (
     <NavigationContainer>
-      {user ? <TabNavigator /> : <SignInScreen />}
+      {user ? <TabNavigator /> : <SigninScreen />}
     </NavigationContainer>
   );
 }

@@ -14,12 +14,12 @@ export default function LoginLink() {
   return (
     <>
       <Text style={styles.loginText}>
-        Déjà inscrit ?{' '}
+        Besoin d'un compte ?{' '}
         <Text
           style={styles.linkText}
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => navigation.navigate('Signin')}
         >
-          Se connecter
+          S'inscrire
         </Text>
       </Text>
     </>

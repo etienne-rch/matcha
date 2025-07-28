@@ -5,6 +5,7 @@ import rnpTheme from '@/themes/rnpTheme';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: rnpTheme.spacing.md,
   },
   input: {
     flex: 1,

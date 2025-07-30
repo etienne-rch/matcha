@@ -107,3 +107,43 @@ describe('POST /api/profile', () => {
     );
   });
 });
+
+describe('DELETE /api/profile/account', () => {
+  it('should delete the user account and related data', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const userBefore = await User.findOne({});
+    expect(userBefore).not.toBeNull();
+
+    const res = await request(app)
+      .delete(`${BASE_URL}/account`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toMatch(/deleted/i);
+
+    const userAfter = await User.findById(userBefore!._id);
+    expect(userAfter).toBeNull();
+  });
+
+  it('should return 401 if no token is provided', async () => {
+    const res = await request(app).delete(`${BASE_URL}/account`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toMatch(/missing/i);
+  });
+
+  it('should handle already deleted account gracefully', async () => {
+    const { token } = await createUserAndGetToken();
+
+    await request(app)
+      .delete(`${BASE_URL}/account`)
+      .set('Authorization', `Bearer ${token}`);
+
+    const res = await request(app)
+      .delete(`${BASE_URL}/account`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toMatch(/deleted/i);
+  });
+});

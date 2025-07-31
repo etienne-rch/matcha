@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ImageBackground, ScrollView, View } from 'react-native';
 import { Button, Portal, Text } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import LoginLink from '@/components/Auth/LoginLink';
@@ -70,58 +71,69 @@ export default function SigninScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+    <ImageBackground
+      source={require('@/assets/backgrounds/default.jpg')}
+      style={styles.background}
+      resizeMode="cover"
     >
-      <Branding.Logo />
-
-      <View style={styles.formContainer}>
-        <Text variant="headlineMedium" style={styles.title}>
-          Inscription
-        </Text>
-
-        <RegistrationForm
-          {...{
-            nom,
-            prenom,
-            email,
-            motDePasse,
-            setNom,
-            setPrenom,
-            setEmail,
-            setMotDePasse,
-            errors,
-          }}
-        />
-
-        <TextDivider text="OU" />
-
-        <GoogleAuth />
-
-        <Portal>
-          <CGUModal visible={termsModal.visible} onDismiss={termsModal.hide} />
-          <PrivacyModal
-            visible={privacyModal.visible}
-            onDismiss={privacyModal.hide}
-          />
-        </Portal>
-
-        <TermsAndPrivacyText
-          showModalTerms={termsModal.show}
-          showModalPrivacy={privacyModal.show}
-        />
-
-        <Button
-          mode="contained"
-          onPress={handleRegister}
-          style={styles.continueButton}
+      <SafeAreaView style={styles.safeAreaView}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
         >
-          Continuer
-        </Button>
+          <Branding.Logo />
 
-        <LoginLink />
-      </View>
-    </ScrollView>
+          <View style={styles.formContainer}>
+            <Text variant="headlineMedium" style={styles.title}>
+              Inscription
+            </Text>
+
+            <RegistrationForm
+              {...{
+                nom,
+                prenom,
+                email,
+                motDePasse,
+                setNom,
+                setPrenom,
+                setEmail,
+                setMotDePasse,
+                errors,
+              }}
+            />
+
+            <TextDivider text="OU" />
+
+            <GoogleAuth />
+
+            <Portal>
+              <CGUModal
+                visible={termsModal.visible}
+                onDismiss={termsModal.hide}
+              />
+              <PrivacyModal
+                visible={privacyModal.visible}
+                onDismiss={privacyModal.hide}
+              />
+            </Portal>
+
+            <TermsAndPrivacyText
+              showModalTerms={termsModal.show}
+              showModalPrivacy={privacyModal.show}
+            />
+
+            <Button
+              mode="contained"
+              onPress={handleRegister}
+              style={styles.continueButton}
+            >
+              Continuer
+            </Button>
+
+            <LoginLink />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }

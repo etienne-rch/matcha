@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ImageBackground, ScrollView, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import SigninLink from '@/components/Auth/SigninLink';
@@ -9,7 +10,7 @@ import TextDivider from '@/components/Divider/TextDivider';
 import LoginForm from '@/components/Forms/LoginForm';
 import { styles } from '@/themes/styles';
 
-export default function SigninScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
 
@@ -49,42 +50,50 @@ export default function SigninScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+    <ImageBackground
+      source={require('@/assets/backgrounds/default.jpg')}
+      style={styles.background}
+      resizeMode="cover"
     >
-      <Branding.Logo />
+      <SafeAreaView style={styles.safeAreaView}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+        >
+          <Branding.Logo />
 
-      <View style={styles.formContainer}>
-        <Text variant="headlineMedium" style={styles.title}>
-          Connexion
-        </Text>
+          <View style={styles.formContainer}>
+            <Text variant="headlineMedium" style={styles.title}>
+              Connexion
+            </Text>
 
-        <LoginForm
-          {...{
-            email,
-            motDePasse,
-            setEmail,
-            setMotDePasse,
-            errors,
-          }}
-        />
+            <LoginForm
+              {...{
+                email,
+                motDePasse,
+                setEmail,
+                setMotDePasse,
+                errors,
+              }}
+            />
 
-        <TextDivider text="OU" />
-        <View style={styles.container}>
-          <GoogleAuth />
+            <TextDivider text="OU" />
+            <View style={styles.container}>
+              <GoogleAuth />
 
-          <Button
-            mode="contained"
-            onPress={handleLogin}
-            style={styles.continueButton}
-          >
-            Continuer
-          </Button>
-        </View>
+              <Button
+                mode="contained"
+                onPress={handleLogin}
+                style={styles.continueButton}
+              >
+                Continuer
+              </Button>
+            </View>
 
-        <SigninLink />
-      </View>
-    </ScrollView>
+            <SigninLink />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }

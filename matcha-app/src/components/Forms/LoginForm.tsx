@@ -3,16 +3,7 @@ import { HelperText, TextInput } from 'react-native-paper';
 
 import { styles } from '@/themes/styles';
 
-type LoginFormProps = {
-  email: string;
-  motDePasse: string;
-  setEmail: (text: string) => void;
-  setMotDePasse: (text: string) => void;
-  errors: {
-    email?: string;
-    motDePasse?: string;
-  };
-};
+import { LoginFormProps } from './types';
 
 export default function LoginForm({
   email,
@@ -23,7 +14,6 @@ export default function LoginForm({
 }: LoginFormProps) {
   return (
     <View style={styles.inputContainer}>
-      {/* Email */}
       <TextInput
         label="Email"
         value={email}
@@ -36,7 +26,6 @@ export default function LoginForm({
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
-      {/* Mot de Passe */}
       <TextInput
         label="Mot de Passe"
         value={motDePasse}

@@ -33,8 +33,8 @@ export default function SigninScreen() {
     if (!motDePasse.trim()) {
       newErrors.motDePasse = 'Le mot de passe est requis';
       valid = false;
-    } else if (motDePasse.length < 6) {
-      newErrors.motDePasse = 'Minimum 6 caractères';
+    } else if (motDePasse.length < 8) {
+      newErrors.motDePasse = 'Minimum 8 caractères';
       valid = false;
     }
 

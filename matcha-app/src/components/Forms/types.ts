@@ -8,3 +8,14 @@ export type RegistrationFormProps = {
   setEmail: (value: string) => void;
   setMotDePasse: (value: string) => void;
 };
+
+export type LoginFormProps = {
+  email: string;
+  motDePasse: string;
+  setEmail: (text: string) => void;
+  setMotDePasse: (text: string) => void;
+  errors: {
+    email?: string;
+    motDePasse?: string;
+  };
+};

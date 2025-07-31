@@ -21,7 +21,6 @@ export default function RegistrationForm(
 
   return (
     <View style={styles.inputContainer}>
-      {/* Nom */}
       <TextInput
         label="Nom"
         value={nom}
@@ -32,7 +31,6 @@ export default function RegistrationForm(
       />
       {errors.nom && <HelperText type="error">{errors.nom}</HelperText>}
 
-      {/* Prénom */}
       <TextInput
         label="Prénom"
         value={prenom}
@@ -43,7 +41,6 @@ export default function RegistrationForm(
       />
       {errors.prenom && <HelperText type="error">{errors.prenom}</HelperText>}
 
-      {/* Email */}
       <TextInput
         label="Email"
         value={email}
@@ -56,7 +53,6 @@ export default function RegistrationForm(
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
-      {/* Mot de Passe */}
       <TextInput
         label="Mot de Passe"
         value={motDePasse}

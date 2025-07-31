@@ -77,6 +77,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     color: '#666',
   },
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
 });
 
 export { styles };

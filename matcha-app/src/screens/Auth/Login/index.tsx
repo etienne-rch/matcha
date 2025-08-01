@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
 import ForgotPasswordLink from '@/components/Auth/ForgotPasswordLink';
+import GoogleAuth from '@/components/Auth/GoogleAuth';
 import SigninLink from '@/components/Auth/SigninLink';
-import GoogleAuth from '@/components/Auth/googleAuth';
 import TextDivider from '@/components/Divider/TextDivider';
 import LoginForm from '@/components/Forms/LoginForm';
 import { styles } from '@/themes/styles';

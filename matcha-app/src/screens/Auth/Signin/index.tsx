@@ -4,8 +4,8 @@ import { Portal, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
+import GoogleAuth from '@/components/Auth/GoogleAuth';
 import LoginLink from '@/components/Auth/LoginLink';
-import GoogleAuth from '@/components/Auth/googleAuth';
 import TextDivider from '@/components/Divider/TextDivider';
 import RegistrationForm from '@/components/Forms/RegistrationForm';
 import CGUModal from '@/components/Modals/CGUModal';

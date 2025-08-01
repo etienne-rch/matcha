@@ -4,9 +4,9 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
+import GoogleAuth from '@/components/Auth/GoogleAuth';
 import LoginLink from '@/components/Auth/LoginLink';
 import SigninLink from '@/components/Auth/SigninLink';
-import GoogleAuth from '@/components/Auth/googleAuth';
 import TextDivider from '@/components/Divider/TextDivider';
 import ForgotPasswordForm from '@/components/Forms/ForgotPasswordForm';
 import { styles } from '@/themes/styles';
@@ -31,7 +31,7 @@ export default function ForgotPasswordScreen() {
               Mot de passe oublié
             </Text>
             {sent ? (
-              <Text style={{ marginVertical: 16 }}>
+              <Text>
                 Si cet email existe, un lien de réinitialisation a été envoyé.
               </Text>
             ) : (

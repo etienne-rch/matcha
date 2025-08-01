@@ -88,6 +88,18 @@ const styles = StyleSheet.create({
     marginTop: rnpTheme.spacing.md,
     gap: rnpTheme.spacing.sm,
   },
+  linkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  linkButton: {
+    padding: 0,
+    margin: 0,
+    minWidth: 0,
+    textAlign: 'center',
+    color: '#666',
+  },
 });
 
 export { styles };

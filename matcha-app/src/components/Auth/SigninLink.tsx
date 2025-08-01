@@ -1,7 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
-import { Text } from 'react-native-paper';
+import { View } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 
 import { styles } from '@/themes/styles';
 import { AuthStackParamList } from '@/types/navigation';
@@ -12,16 +13,17 @@ export default function SigninLink() {
   const navigation = useNavigation<NavigationProp>();
 
   return (
-    <>
-      <Text style={styles.loginText}>
-        Besoin d'un compte ?{' '}
-        <Text
-          style={styles.linkText}
-          onPress={() => navigation.navigate('Signin')}
-        >
-          S'inscrire
-        </Text>
-      </Text>
-    </>
+    <View style={styles.linkContainer}>
+      <Text>Besoin d'un compte ? </Text>
+      <Button
+        mode="text"
+        compact
+        style={styles.linkButton}
+        labelStyle={styles.linkText}
+        onPress={() => navigation.navigate('Signin')}
+      >
+        S'inscrire
+      </Button>
+    </View>
   );
 }

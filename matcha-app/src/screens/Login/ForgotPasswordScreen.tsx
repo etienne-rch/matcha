@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ImageBackground, ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
-import ForgotPasswordLink from '@/components/Auth/ForgotPasswordLink';
+import LoginLink from '@/components/Auth/LoginLink';
 import SigninLink from '@/components/Auth/SigninLink';
 import GoogleAuth from '@/components/Auth/googleAuth';
 import TextDivider from '@/components/Divider/TextDivider';
-import LoginForm from '@/components/Forms/LoginForm';
+import ForgotPasswordForm from '@/components/Forms/ForgotPasswordForm';
 import { styles } from '@/themes/styles';
 
-export default function LoginScreen() {
+export default function ForgotPasswordScreen() {
+  const [sent, setSent] = useState(false);
+
   return (
     <ImageBackground
       source={require('@/assets/backgrounds/default.jpg')}
@@ -24,22 +26,29 @@ export default function LoginScreen() {
           contentContainerStyle={styles.contentContainer}
         >
           <Branding.Logo />
-
           <View style={styles.formContainer}>
             <Text variant="headlineMedium" style={styles.title}>
-              Connexion
+              Mot de passe oublié
             </Text>
-
-            <LoginForm />
+            {sent ? (
+              <Text style={{ marginVertical: 16 }}>
+                Si cet email existe, un lien de réinitialisation a été envoyé.
+              </Text>
+            ) : (
+              <ForgotPasswordForm
+                {...{
+                  setSent,
+                }}
+              />
+            )}
 
             <TextDivider text="OU" />
             <View style={styles.container}>
               <GoogleAuth />
             </View>
-
             <View style={styles.linksContainer}>
               <SigninLink />
-              <ForgotPasswordLink />
+              <LoginLink />
             </View>
           </View>
         </ScrollView>

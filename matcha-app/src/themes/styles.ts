@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: rnpTheme.fontSize.sm,
-    marginBottom: rnpTheme.spacing.sm,
     backgroundColor: rnpTheme.colors.background,
   },
   contentContainer: {
@@ -39,6 +38,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat_700Bold',
   },
   inputContainer: {
+    gap: rnpTheme.spacing.sm,
     padding: 0,
     margin: 0,
   },
@@ -71,11 +71,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   continueButton: {
+    marginTop: rnpTheme.spacing.sm,
     borderRadius: 6,
   },
   loginText: {
     textAlign: 'center',
-    marginTop: rnpTheme.spacing.md,
     color: '#666',
   },
   safeAreaView: {
@@ -83,6 +83,10 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
+  },
+  linksContainer: {
+    marginTop: rnpTheme.spacing.md,
+    gap: rnpTheme.spacing.sm,
   },
 });
 

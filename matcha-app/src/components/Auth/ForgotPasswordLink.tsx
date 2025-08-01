@@ -8,18 +8,18 @@ import { AuthStackParamList } from '@/types/navigation';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
-export default function SigninLink() {
+export default function ForgotPasswordLink() {
   const navigation = useNavigation<NavigationProp>();
 
   return (
     <>
       <Text style={styles.loginText}>
-        Besoin d'un compte ?{' '}
+        Mot de passe oublié ?{' '}
         <Text
           style={styles.linkText}
-          onPress={() => navigation.navigate('Signin')}
+          onPress={() => navigation.navigate('ForgotPassword')}
         >
-          S'inscrire
+          Cliquez ici
         </Text>
       </Text>
     </>

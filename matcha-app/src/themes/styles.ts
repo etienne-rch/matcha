@@ -5,6 +5,7 @@ import rnpTheme from '@/themes/rnpTheme';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    gap: rnpTheme.spacing.md,
   },
   input: {
     flex: 1,
@@ -35,6 +36,7 @@ const styles = StyleSheet.create({
     marginBottom: rnpTheme.spacing.md,
     fontWeight: 'bold',
     color: rnpTheme.colors.primary,
+    fontFamily: 'Montserrat_700Bold',
   },
   inputContainer: {
     padding: 0,
@@ -73,8 +75,14 @@ const styles = StyleSheet.create({
   },
   loginText: {
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: rnpTheme.spacing.md,
     color: '#666',
+  },
+  safeAreaView: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
   },
 });
 

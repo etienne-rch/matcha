@@ -1,46 +1,19 @@
 import { View } from 'react-native';
 import { HelperText, TextInput } from 'react-native-paper';
 
-import { RegistrationFormProps } from '@/components/Forms/types';
 import { styles } from '@/themes/styles';
 
-export default function RegistrationForm(
-  props: RegistrationFormProps & { errors: any },
-) {
-  const {
-    nom,
-    prenom,
-    email,
-    motDePasse,
-    setNom,
-    setPrenom,
-    setEmail,
-    setMotDePasse,
-    errors,
-  } = props;
+import { LoginFormProps } from './types';
 
+export default function LoginForm({
+  email,
+  motDePasse,
+  setEmail,
+  setMotDePasse,
+  errors,
+}: LoginFormProps) {
   return (
     <View style={styles.inputContainer}>
-      <TextInput
-        label="Nom"
-        value={nom}
-        onChangeText={setNom}
-        mode="outlined"
-        style={styles.input}
-        error={!!errors.nom}
-      />
-      {errors.nom && <HelperText type="error">{errors.nom}</HelperText>}
-
-      <TextInput
-        label="Prénom"
-        value={prenom}
-        onChangeText={setPrenom}
-        mode="outlined"
-        style={styles.input}
-        error={!!errors.prenom}
-      />
-      {errors.prenom && <HelperText type="error">{errors.prenom}</HelperText>}
-
       <TextInput
         label="Email"
         value={email}

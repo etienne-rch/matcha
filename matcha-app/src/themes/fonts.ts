@@ -1,7 +1,7 @@
 const Fonts = {
-  title: 'PolySans Trial, Helvetica, Arial, sans-serif',
-  body: 'Montserrat, system-ui, -apple-system, sans-serif',
-  logo: 'Croist, serif, Times New Roman',
+  title: 'PolySans Trial',
+  body: 'Montserrat-Regular',
+  logo: 'Croist',
 };
 
 export default Fonts;

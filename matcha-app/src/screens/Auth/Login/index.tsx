@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ImageBackground, ScrollView, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
-import LoginLink from '@/components/Auth/LoginLink';
+import ForgotPasswordLink from '@/components/Auth/ForgotPasswordLink';
+import GoogleAuth from '@/components/Auth/GoogleAuth';
 import SigninLink from '@/components/Auth/SigninLink';
-import GoogleAuth from '@/components/Auth/googleAuth';
 import TextDivider from '@/components/Divider/TextDivider';
-import ForgotPasswordForm from '@/components/Forms/ForgotPasswordForm';
+import LoginForm from '@/components/Forms/LoginForm';
 import { styles } from '@/themes/styles';
 
-export default function ForgotPasswordScreen() {
-  const [sent, setSent] = useState(false);
-
+export default function LoginScreen() {
   return (
     <ImageBackground
       source={require('@/assets/backgrounds/default.jpg')}
@@ -26,29 +24,22 @@ export default function ForgotPasswordScreen() {
           contentContainerStyle={styles.contentContainer}
         >
           <Branding.Logo />
+
           <View style={styles.formContainer}>
             <Text variant="headlineMedium" style={styles.title}>
-              Mot de passe oublié
+              Connexion
             </Text>
-            {sent ? (
-              <Text style={{ marginVertical: 16 }}>
-                Si cet email existe, un lien de réinitialisation a été envoyé.
-              </Text>
-            ) : (
-              <ForgotPasswordForm
-                {...{
-                  setSent,
-                }}
-              />
-            )}
+
+            <LoginForm />
 
             <TextDivider text="OU" />
             <View style={styles.container}>
               <GoogleAuth />
             </View>
+
             <View style={styles.linksContainer}>
               <SigninLink />
-              <LoginLink />
+              <ForgotPasswordLink />
             </View>
           </View>
         </ScrollView>

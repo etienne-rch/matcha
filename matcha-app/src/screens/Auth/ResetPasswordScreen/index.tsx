@@ -4,14 +4,13 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
-import ForgotPasswordLink from '@/components/Auth/ForgotPasswordLink';
+import GoogleAuth from '@/components/Auth/GoogleAuth';
+import LoginLink from '@/components/Auth/LoginLink';
 import SigninLink from '@/components/Auth/SigninLink';
-import GoogleAuth from '@/components/Auth/googleAuth';
 import TextDivider from '@/components/Divider/TextDivider';
-import LoginForm from '@/components/Forms/LoginForm';
 import { styles } from '@/themes/styles';
 
-export default function LoginScreen() {
+export default function ResetPasswordScreen() {
   return (
     <ImageBackground
       source={require('@/assets/backgrounds/default.jpg')}
@@ -24,22 +23,18 @@ export default function LoginScreen() {
           contentContainerStyle={styles.contentContainer}
         >
           <Branding.Logo />
-
           <View style={styles.formContainer}>
             <Text variant="headlineMedium" style={styles.title}>
-              Connexion
+              Réinitialiser le mot de passe
             </Text>
-
-            <LoginForm />
 
             <TextDivider text="OU" />
             <View style={styles.container}>
               <GoogleAuth />
             </View>
-
             <View style={styles.linksContainer}>
               <SigninLink />
-              <ForgotPasswordLink />
+              <LoginLink />
             </View>
           </View>
         </ScrollView>

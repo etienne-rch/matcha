@@ -1,8 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 
+import AuthStack from '@/navigation/AuthStack';
 import TabNavigator from '@/navigation/TabNavigator';
-
-import AuthStack from './AuthStack';
 
 export default function AppNavigator() {
   const user = false;

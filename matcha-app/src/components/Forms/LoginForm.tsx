@@ -1,17 +1,47 @@
+import React, { useState } from 'react';
 import { View } from 'react-native';
-import { HelperText, TextInput } from 'react-native-paper';
+import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { styles } from '@/themes/styles';
 
-import { LoginFormProps } from './types';
+export default function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [motDePasse, setMotDePasse] = useState('');
 
-export default function LoginForm({
-  email,
-  motDePasse,
-  setEmail,
-  setMotDePasse,
-  errors,
-}: LoginFormProps) {
+  const [errors, setErrors] = useState({
+    email: '',
+    motDePasse: '',
+  });
+  const validateForm = () => {
+    let valid = true;
+    let newErrors = { email: '', motDePasse: '' };
+
+    if (!email.trim()) {
+      newErrors.email = 'L’email est requis';
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Format d’email invalide';
+      valid = false;
+    }
+
+    if (!motDePasse.trim()) {
+      newErrors.motDePasse = 'Le mot de passe est requis';
+      valid = false;
+    } else if (motDePasse.length < 8) {
+      newErrors.motDePasse = 'Minimum 8 caractères';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleLogin = () => {
+    if (validateForm()) {
+      console.log('Formulaire valide → Inscription...');
+    }
+  };
+
   return (
     <View style={styles.inputContainer}>
       <TextInput
@@ -38,6 +68,14 @@ export default function LoginForm({
       {errors.motDePasse && (
         <HelperText type="error">{errors.motDePasse}</HelperText>
       )}
+
+      <Button
+        mode="contained"
+        onPress={handleLogin}
+        style={styles.continueButton}
+      >
+        Continuer
+      </Button>
     </View>
   );
 }

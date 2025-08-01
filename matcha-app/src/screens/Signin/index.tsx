@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ImageBackground, ScrollView, View } from 'react-native';
-import { Button, Portal, Text } from 'react-native-paper';
+import { Portal, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
@@ -15,60 +15,8 @@ import { useModal } from '@/hooks/useModals';
 import { styles } from '@/themes/styles';
 
 export default function SigninScreen() {
-  const [nom, setNom] = useState('');
-  const [prenom, setPrenom] = useState('');
-  const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
-
-  const [errors, setErrors] = useState({
-    nom: '',
-    prenom: '',
-    email: '',
-    motDePasse: '',
-  });
-
   const termsModal = useModal();
   const privacyModal = useModal();
-
-  const validateForm = () => {
-    let valid = true;
-    let newErrors = { nom: '', prenom: '', email: '', motDePasse: '' };
-
-    if (!nom.trim()) {
-      newErrors.nom = 'Le nom est requis';
-      valid = false;
-    }
-
-    if (!prenom.trim()) {
-      newErrors.prenom = 'Le prénom est requis';
-      valid = false;
-    }
-
-    if (!email.trim()) {
-      newErrors.email = 'L’email est requis';
-      valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Format d’email invalide';
-      valid = false;
-    }
-
-    if (!motDePasse.trim()) {
-      newErrors.motDePasse = 'Le mot de passe est requis';
-      valid = false;
-    } else if (motDePasse.length < 8) {
-      newErrors.motDePasse = 'Minimum 8 caractères';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleRegister = () => {
-    if (validateForm()) {
-      console.log('Formulaire valide → Inscription...');
-    }
-  };
 
   return (
     <ImageBackground
@@ -88,19 +36,7 @@ export default function SigninScreen() {
               Inscription
             </Text>
 
-            <RegistrationForm
-              {...{
-                nom,
-                prenom,
-                email,
-                motDePasse,
-                setNom,
-                setPrenom,
-                setEmail,
-                setMotDePasse,
-                errors,
-              }}
-            />
+            <RegistrationForm />
 
             <TextDivider text="OU" />
 
@@ -122,15 +58,9 @@ export default function SigninScreen() {
               showModalPrivacy={privacyModal.show}
             />
 
-            <Button
-              mode="contained"
-              onPress={handleRegister}
-              style={styles.continueButton}
-            >
-              Continuer
-            </Button>
-
-            <LoginLink />
+            <View style={styles.linksContainer}>
+              <LoginLink />
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>

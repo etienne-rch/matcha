@@ -1,23 +1,61 @@
+import React, { useState } from 'react';
 import { View } from 'react-native';
-import { HelperText, TextInput } from 'react-native-paper';
+import { Button, HelperText, TextInput } from 'react-native-paper';
 
-import { RegistrationFormProps } from '@/components/Forms/types';
 import { styles } from '@/themes/styles';
 
-export default function RegistrationForm(
-  props: RegistrationFormProps & { errors: any },
-) {
-  const {
-    nom,
-    prenom,
-    email,
-    motDePasse,
-    setNom,
-    setPrenom,
-    setEmail,
-    setMotDePasse,
-    errors,
-  } = props;
+export default function RegistrationForm() {
+  const [nom, setNom] = useState('');
+  const [prenom, setPrenom] = useState('');
+  const [email, setEmail] = useState('');
+  const [motDePasse, setMotDePasse] = useState('');
+
+  const [errors, setErrors] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    motDePasse: '',
+  });
+
+  const validateForm = () => {
+    let valid = true;
+    let newErrors = { nom: '', prenom: '', email: '', motDePasse: '' };
+
+    if (!nom.trim()) {
+      newErrors.nom = 'Le nom est requis';
+      valid = false;
+    }
+
+    if (!prenom.trim()) {
+      newErrors.prenom = 'Le prénom est requis';
+      valid = false;
+    }
+
+    if (!email.trim()) {
+      newErrors.email = 'L’email est requis';
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Format d’email invalide';
+      valid = false;
+    }
+
+    if (!motDePasse.trim()) {
+      newErrors.motDePasse = 'Le mot de passe est requis';
+      valid = false;
+    } else if (motDePasse.length < 8) {
+      newErrors.motDePasse = 'Minimum 8 caractères';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleRegister = () => {
+    if (validateForm()) {
+      console.log('Formulaire valide → Inscription...');
+    }
+  };
 
   return (
     <View style={styles.inputContainer}>
@@ -65,6 +103,14 @@ export default function RegistrationForm(
       {errors.motDePasse && (
         <HelperText type="error">{errors.motDePasse}</HelperText>
       )}
+
+      <Button
+        mode="contained"
+        onPress={handleRegister}
+        style={styles.continueButton}
+      >
+        Continuer
+      </Button>
     </View>
   );
 }

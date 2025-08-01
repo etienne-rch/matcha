@@ -8,6 +8,7 @@ import GoogleAuth from '@/components/Auth/GoogleAuth';
 import LoginLink from '@/components/Auth/LoginLink';
 import SigninLink from '@/components/Auth/SigninLink';
 import TextDivider from '@/components/Divider/TextDivider';
+import ResetPasswordForm from '@/components/Forms/ResetPasswordForm';
 import { styles } from '@/themes/styles';
 
 export default function ResetPasswordScreen() {
@@ -27,6 +28,8 @@ export default function ResetPasswordScreen() {
             <Text variant="headlineMedium" style={styles.title}>
               Réinitialiser le mot de passe
             </Text>
+
+            <ResetPasswordForm />
 
             <TextDivider text="OU" />
             <View style={styles.container}>

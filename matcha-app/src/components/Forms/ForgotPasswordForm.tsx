@@ -4,6 +4,7 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { ForgotPasswordFormProps } from '@/components/Forms/types';
 import { styles } from '@/themes/styles';
+import { validateEmail } from '@/utils/validation';
 
 export default function ForgotPasswordForm({
   setSent,
@@ -16,7 +17,7 @@ export default function ForgotPasswordForm({
       setError('L’email est requis');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!validateEmail(email)) {
       setError('Format d’email invalide');
       return;
     }
@@ -24,6 +25,7 @@ export default function ForgotPasswordForm({
     setSent(true);
     // appel API
   };
+
   return (
     <View style={styles.inputContainer}>
       <TextInput

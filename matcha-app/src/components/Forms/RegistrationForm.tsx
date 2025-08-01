@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
 import { styles } from '@/themes/styles';
+import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function RegistrationForm() {
   const [nom, setNom] = useState('');
@@ -34,7 +35,7 @@ export default function RegistrationForm() {
     if (!email.trim()) {
       newErrors.email = 'L’email est requis';
       valid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    } else if (!validateEmail(email)) {
       newErrors.email = 'Format d’email invalide';
       valid = false;
     }
@@ -42,8 +43,9 @@ export default function RegistrationForm() {
     if (!motDePasse.trim()) {
       newErrors.motDePasse = 'Le mot de passe est requis';
       valid = false;
-    } else if (motDePasse.length < 8) {
-      newErrors.motDePasse = 'Minimum 8 caractères';
+    } else if (!validatePassword(motDePasse)) {
+      newErrors.motDePasse =
+        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
       valid = false;
     }
 

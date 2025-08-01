@@ -2,10 +2,12 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Button, HelperText, Text, TextInput } from 'react-native-paper';
+import { Button, HelperText, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
 import { styles } from '@/themes/styles';
 import { AuthStackParamList } from '@/types/navigation';
+import { validatePassword } from '@/utils/validation';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -15,11 +17,6 @@ export default function ResetPasswordForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const navigation = useNavigation<NavigationProp>();
-
-  const validatePassword = (pwd: string) => {
-    // Au moins 8 caractères, une majuscule, une minuscule, un chiffre
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
-  };
 
   const handleSubmit = () => {
     if (!password || !confirm) {
@@ -38,18 +35,17 @@ export default function ResetPasswordForm() {
     }
     setError('');
     setSuccess(true);
+    Toast.show({
+      type: 'success',
+      text1: 'Mot de passe modifié avec succès',
+      text2: "Vous allez être redirigé vers l'écran de connexion",
+      position: 'top',
+      visibilityTime: 3000,
+    });
     setTimeout(() => {
       navigation.navigate('Login');
-    }, 2000);
+    }, 3000);
   };
-
-  if (success) {
-    return (
-      <View style={styles.inputContainer}>
-        <Text style={styles.title}>Mot de passe modifié avec succès</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.inputContainer}>

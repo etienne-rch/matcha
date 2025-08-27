@@ -1,3 +1,55 @@
+# 🔁 Synchronisation GitHub ↔ GitLab
+
+Tout le monde travaille sur **GitHub**, puis on synchronise la branche `main` avec **GitLab**. Voici comment configurer votre environnement une bonne fois pour toutes.
+
+---
+
+## 🛠️ Étapes d’installation
+
+1. **Re-clonez le repo depuis GitHub**  
+   (Supprimez l’ancien si besoin, puis cloner depuis GitHub)
+
+2. **Dans le dossier cloné, ouvrez un terminal et collez ces commandes :**
+
+```bash
+git remote rename origin github
+git remote add gitlab git@rendu-git.etna-alternance.net:module-10020/activity-53631/group-1056970
+
+git config user.name "gu_z" # 🔁 Remplacez par votre propre nom d'utilisateur
+git config user.email "gu_z@etna-alternance.net" # 🔁 Remplacez par votre adresse email ETNA
+```
+
+---
+
+## 🚀 Pour faire un push vers les deux repos (GitHub & GitLab)
+
+À chaque push sur `main`, utilisez les commandes suivantes :
+
+```bash
+git push github main
+git push gitlab main
+```
+
+⛔ **Ne faites jamais de push direct sur GitLab sans passer par GitHub pour la branche `main`**.
+
+---
+
+## 🔐 Si on vous demande un login / mot de passe :
+
+- **Nom d’utilisateur** = votre identifiant ETNA (ex: `seck_b`)  
+- **Mot de passe** = collez votre **token GitLab**
+
+---
+
+## ⚠️ Rappels importants
+
+- Toutes les modifs sur la branche `main` doivent **obligatoirement passer par GitHub**.
+- Pour vos **commits perso d’e-learning**, créez une **branche à votre nom sur GitLab** et **push uniquement dessus**.
+- La **synchronisation automatique ne concerne que la branche `main`**.
+- Pour toutes les autres branches : vous pouvez travailler librement, elles ne seront pas synchronisées entre les deux plateformes.
+
+---
+
 # Matcha
 
 Ce projet utilise **Turborepo** pour gérer efficacement plusieurs packages dans un seul dépôt.

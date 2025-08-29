@@ -7,8 +7,8 @@ import { googleLogin } from "@/controllers/google.controller";
 const router = Router();
 
 /**
- * Endpoint : POST /api/auth/login
- * Vérifie les données et appelle le contrôleur login
+ * Endpoint: POST /api/auth/login
+ * Validates the input data and calls the login controller
  */
 router.post("/login", loginValidator, login);
 

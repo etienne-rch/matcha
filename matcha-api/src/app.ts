@@ -1,8 +1,8 @@
 import express from 'express';
 
 import { errorHandler } from '@/middlewares/error.middleware';
-import healthRoutes from '@/routes/health.routes';
 import authRoutes from '@/routes/auth.routes';
+import healthRoutes from '@/routes/health.routes';
 
 const app = express();
 

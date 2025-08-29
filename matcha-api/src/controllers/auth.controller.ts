@@ -5,10 +5,10 @@ import jwt from "jsonwebtoken";
 import User from "@/models/User";
 
 /**
- * Contrôleur de connexion utilisateur
+ * User login controller
  */
 export const login = async (req: Request, res: Response) => {
-  // Vérification des erreurs de validation
+  // Check for validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -17,22 +17,22 @@ export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    // Chercher utilisateur par email
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Utilisateur inexistant" });
+      return res.status(401).json({ message: "User does not exist" });
     }
     if (!user.passwordHash) {
-      return res.status(401).json({ message: "Utilisateur sans mot de passe local" });
+      return res.status(401).json({ message: "User has no local password" });
     }
     
-    // Vérifier le mot de passe hashé
+    // Verify hashed password
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ message: "Mot de passe incorrect" });
+      return res.status(401).json({ message: "Incorrect password" });
     }
 
-    // Générer un JWT valide 24h
+    // Generate a JWT valid for 24h
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET || "changeme",
@@ -51,6 +51,6 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Erreur interne du serveur" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

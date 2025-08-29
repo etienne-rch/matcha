@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { Request, Response } from "express";
-import mongoose from "mongoose";
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 import User from "@/models/User";
 import { sendValidationEmail } from "@/services/email";

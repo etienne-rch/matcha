@@ -1,25 +1,31 @@
 import request from "supertest";
 import app from "@/app";
 import User from "@/models/User";
-
-// --- Préparer un mock de verifyIdToken que l’on peut contrôler ---
-const mockVerifyIdToken = jest.fn();
-
-jest.mock("google-auth-library", () => {
-  return {
-    OAuth2Client: jest.fn().mockImplementation(() => ({
-      verifyIdToken: mockVerifyIdToken,
-    })),
-  };
-});
+import { OAuth2Client } from "google-auth-library";
 
 describe("POST /api/auth/google", () => {
+  let mockVerifyIdToken: jest.Mock;
+
   beforeEach(async () => {
+    // Nettoyer la collection des utilisateurs avant chaque test
     await User.deleteMany({});
-    mockVerifyIdToken.mockReset(); 
+
+    // Créer un mock pour verifyIdToken
+    mockVerifyIdToken = jest.fn();
+
+    // Remplacer la méthode réelle par le mock
+    jest
+      .spyOn(OAuth2Client.prototype, "verifyIdToken")
+      .mockImplementation(mockVerifyIdToken);
+  });
+
+  afterEach(() => {
+    // Réinitialiser tous les mocks après chaque test
+    jest.restoreAllMocks();
   });
 
   it("devrait créer un nouvel utilisateur Google et retourner un JWT", async () => {
+    // Simuler un payload valide renvoyé par Google
     mockVerifyIdToken.mockResolvedValue({
       getPayload: () => ({
         email: "googleuser@example.com",
@@ -37,12 +43,13 @@ describe("POST /api/auth/google", () => {
     expect(res.body).toHaveProperty("token");
     expect(res.body.user.email).toBe("googleuser@example.com");
 
+    // Vérifier que l’utilisateur a bien été créé
     const user = await User.findOne({ email: "googleuser@example.com" });
     expect(user).not.toBeNull();
   });
 
   it("devrait retourner 401 si Google renvoie un token invalide", async () => {
-    // cette fois le mock renvoie un payload vide
+    // Simuler un token invalide
     mockVerifyIdToken.mockResolvedValue({
       getPayload: () => null,
     });

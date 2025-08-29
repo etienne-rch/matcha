@@ -1,6 +1,6 @@
-import app from "@/app";
 import bcrypt from "bcrypt";
 import request from "supertest";
+import app from "@/app";
 import User from "@/models/User";
 
 // ⚙️ Préparer un utilisateur test dans la base

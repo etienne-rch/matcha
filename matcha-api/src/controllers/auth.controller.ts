@@ -22,7 +22,10 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(401).json({ message: "Utilisateur inexistant" });
     }
-
+    if (!user.passwordHash) {
+      return res.status(401).json({ message: "Utilisateur sans mot de passe local" });
+    }
+    
     // Vérifier le mot de passe hashé
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {

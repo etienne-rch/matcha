@@ -1,22 +1,22 @@
 FROM node:22.2.0-alpine
 
-# Définir le dossier de travail
+# Set the working directory
 WORKDIR /app
 
-# Activer corepack pour yarn
+# Enable corepack for yarn
 RUN corepack enable
 
-# Copier uniquement les fichiers de dépendances (optimisation du cache Docker)
+# Copy only dependency files (optimize Docker cache)
 COPY package.json yarn.lock* ./
 
-# Installer les dépendances
+# Install dependencies
 RUN yarn install --frozen-lockfile
 
-# Copier le reste du code source
+# Copy the rest of the source code
 COPY . .
 
-# Exposer le port (d'après .env => 3000)
+# Expose the port (from .env => 3000)
 EXPOSE 3000
 
-# Commande de démarrage en mode dev
+# Start command in dev mode
 CMD ["yarn", "dev"]

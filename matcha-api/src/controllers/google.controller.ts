@@ -18,17 +18,18 @@ export const googleLogin = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Token Google manquant" });
     }
 
-    // --- Vérification du token auprès de Google ---
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    }).catch(() => null);
-
-    if (!ticket) {
+    let ticket;
+    try {
+      // --- Vérification du token auprès de Google ---
+      ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+    } catch (err) {
       return res.status(401).json({ message: "Token Google invalide" });
     }
 
-    const payload = ticket.getPayload();
+    const payload = ticket?.getPayload();
     if (!payload || !payload.email) {
       return res.status(401).json({ message: "Token Google invalide" });
     }
@@ -38,15 +39,14 @@ export const googleLogin = async (req: Request, res: Response) => {
     // --- Vérifier si l'utilisateur existe déjà en base ---
     let user = await User.findOne({ email });
 
-    // Si non existant, on le crée avec les infos fournies par Google
     if (!user) {
       user = await User.create({
         email,
         firstName: given_name,
         lastName: family_name,
         avatarUrl: picture,
-        passwordHash: "google-oauth", // ✅ Fix: valeur par défaut requise
-        consentAccepted: true, // Obligatoire dans UserSchema
+        passwordHash: "google-oauth", 
+        consentAccepted: true,
       });
     }
 
@@ -57,7 +57,6 @@ export const googleLogin = async (req: Request, res: Response) => {
       { expiresIn: "24h" }
     );
 
-    // --- Retourner le token + infos utilisateur ---
     return res.status(200).json({ token, user });
   } catch (error) {
     console.error("Erreur Google login:", error);

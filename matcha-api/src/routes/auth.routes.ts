@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { login } from "@/controllers/auth.controller";
+import { login } from "@/controllers/user.controller";
 import { googleLogin } from "@/controllers/user.controller";
 import { loginValidator } from "@/middlewares/authValidators";
 

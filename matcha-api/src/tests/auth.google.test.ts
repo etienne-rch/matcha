@@ -1,7 +1,7 @@
+import { OAuth2Client } from "google-auth-library";
 import request from "supertest";
 import app from "@/app";
 import User from "@/models/User";
-import { OAuth2Client } from "google-auth-library";
 
 describe("POST /api/auth/google", () => {
   let mockVerifyIdToken: jest.Mock;

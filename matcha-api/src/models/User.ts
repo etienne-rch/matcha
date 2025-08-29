@@ -71,8 +71,8 @@ const UserSchema = new Schema(
     addressCountry: { type: String },
 
     isEmailVerified: { type: Boolean, default: false },
-    emailValidationToken: { type: String },
-    emailValidationSentAt: { type: Date },
+    emailVerificationToken: String,
+    emailVerificationTokenExpires: Date
   },
   {
     timestamps: true, // Ajoute automatiquement createdAt / updatedAt

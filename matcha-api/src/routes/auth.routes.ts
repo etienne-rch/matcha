@@ -2,7 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { login } from "@/controllers/auth.controller";
 import { googleLogin } from "@/controllers/google.controller";
-import { loginValidator } from "@/middlewares/validators/authValidators";
+import { loginValidator } from "@/middlewares/authValidators";
 
 const router = Router();
 

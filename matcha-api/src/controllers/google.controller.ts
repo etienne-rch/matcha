@@ -8,31 +8,28 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /**
  * Contrôleur : Connexion via un compte Google
- * Étapes :
- * 1. Récupérer le token envoyé par le client (idToken)
- * 2. Vérifier ce token auprès des serveurs Google
- * 3. Extraire les informations de l'utilisateur depuis le payload
- * 4. Vérifier si l'utilisateur existe déjà en base
- *    - Si non, créer un nouvel utilisateur avec les infos Google
- * 5. Générer un JWT interne à l'application (valide 24h)
- * 6. Retourner le token + les infos de l'utilisateur
  */
 export const googleLogin = async (req: Request, res: Response) => {
   const { idToken } = req.body;
 
   try {
-    // Vérification du token auprès de Google
+    // --- Vérifier si le token est présent ---
+    if (!idToken) {
+      return res.status(401).json({ message: "Token Google manquant" });
+    }
+
+    // --- Vérification du token auprès de Google ---
     const ticket = await client.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     }).catch(() => null);
-    
+
     if (!ticket) {
       return res.status(401).json({ message: "Token Google invalide" });
     }
 
     const payload = ticket.getPayload();
-    if (!payload) {
+    if (!payload || !payload.email) {
       return res.status(401).json({ message: "Token Google invalide" });
     }
 
@@ -48,8 +45,8 @@ export const googleLogin = async (req: Request, res: Response) => {
         firstName: given_name,
         lastName: family_name,
         avatarUrl: picture,
-        passwordHash: "", // Les utilisateurs Google n'ont pas de mot de passe local
-        consentAccepted: true, // Obligatoire d'après ton UserSchema
+        passwordHash: "google-oauth", // ✅ Fix: valeur par défaut requise
+        consentAccepted: true, // Obligatoire dans UserSchema
       });
     }
 

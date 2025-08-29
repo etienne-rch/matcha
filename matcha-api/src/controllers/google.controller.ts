@@ -25,7 +25,11 @@ export const googleLogin = async (req: Request, res: Response) => {
     const ticket = await client.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    }).catch(() => null);
+    
+    if (!ticket) {
+      return res.status(401).json({ message: "Token Google invalide" });
+    }
 
     const payload = ticket.getPayload();
     if (!payload) {

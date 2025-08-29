@@ -8,18 +8,22 @@ import userRoutes from '@/routes/users.routes';
 
 const app = express();
 
-// Middleware pour parser le JSON AVANT les routes
+// Middleware to parse JSON BEFORE the routes
 app.use(express.json());
 
-// Routes d'authentification
+// Authentication routes
 app.use("/api/auth", authRoutes);
 
-// Route de santé (pour monitoring)
+// Health route (for monitoring)
 app.use('/health', healthRoutes);
+
+// User management routes
 app.use('/api/users', userRoutes);
+
+// Profile management routes
 app.use('/api/profile', profileRoutes);
 
-// Middleware global de gestion d'erreurs
+// Global error handling middleware
 app.use(errorHandler);
 
 export default app;

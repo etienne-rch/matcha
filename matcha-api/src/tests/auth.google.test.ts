@@ -7,25 +7,25 @@ describe("POST /api/auth/google", () => {
   let mockVerifyIdToken: jest.Mock;
 
   beforeEach(async () => {
-    // Nettoyer la collection des utilisateurs avant chaque test
+    // Clean the users collection before each test
     await User.deleteMany({});
 
-    // Créer un mock pour verifyIdToken
+    // Create a mock for verifyIdToken
     mockVerifyIdToken = jest.fn();
 
-    // Remplacer la méthode réelle par le mock
+    // Replace the real method with the mock
     jest
       .spyOn(OAuth2Client.prototype, "verifyIdToken")
       .mockImplementation(mockVerifyIdToken);
   });
 
   afterEach(() => {
-    // Réinitialiser tous les mocks après chaque test
+    // Reset all mocks after each test
     jest.restoreAllMocks();
   });
 
-  it("devrait créer un nouvel utilisateur Google et retourner un JWT", async () => {
-    // Simuler un payload valide renvoyé par Google
+  it("should create a new Google user and return a JWT", async () => {
+    // Simulate a valid payload returned by Google
     mockVerifyIdToken.mockResolvedValue({
       getPayload: () => ({
         email: "googleuser@example.com",
@@ -43,13 +43,13 @@ describe("POST /api/auth/google", () => {
     expect(res.body).toHaveProperty("token");
     expect(res.body.user.email).toBe("googleuser@example.com");
 
-    // Vérifier que l’utilisateur a bien été créé
+    // Verify that the user was actually created
     const user = await User.findOne({ email: "googleuser@example.com" });
     expect(user).not.toBeNull();
   });
 
-  it("devrait retourner 401 si Google renvoie un token invalide", async () => {
-    // Simuler un token invalide
+  it("should return 401 if Google returns an invalid token", async () => {
+    // Simulate an invalid token
     mockVerifyIdToken.mockResolvedValue({
       getPayload: () => null,
     });

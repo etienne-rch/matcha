@@ -1,20 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { PaperProvider } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+
+import AppNavigator from '@/navigation/AppNavigator';
+import rnpTheme from '@/themes/rnpTheme';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Hello World</Text>
-      <StatusBar style="auto" />
-    </View>
+    <PaperProvider theme={rnpTheme}>
+      <AppNavigator />
+      <Toast />
+    </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

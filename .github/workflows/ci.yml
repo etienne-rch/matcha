@@ -80,6 +80,9 @@ jobs:
       - name: Lint API
         run: yarn workspace matcha-api run lint
 
+      - name: Cleanup MongoDB binaries cache
+        run: rm -rf ~/.cache/mongodb-binaries
+
       - name: Test API
         run: yarn workspace matcha-api run test
 

@@ -27,6 +27,23 @@ services:
     environment:
       MONGODB_URI: mongodb://mongo:27017
       MONGODB_DB: matcha_dev
+      JWT_SECRET: etna
+
+  cleanup:
+    build:
+      context: .
+      dockerfile: matcha-api/cron.Dockerfile
+    container_name: matcha_cron
+    volumes:
+      - .:/app
+    working_dir: /app/matcha-api
+    depends_on:
+      - mongo
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: matcha_dev
+      JWT_SECRET: etna
+    command: yarn ts-node src/scripts/cleanup-unverified-users.ts
 
 volumes:
   mongo_data:

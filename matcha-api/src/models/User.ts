@@ -1,8 +1,8 @@
 import { Schema, Types, model } from "mongoose";
 
 /**
- * Modèle User basé sur la structure USERS de ton schéma (MongoDB style).
- * Chaque champ correspond directement à la colonne du diagramme.
+ * User model based on the USERS structure from your schema (MongoDB style).
+ * Each field directly corresponds to a column in the diagram.
  */
 const UserSchema = new Schema(
   {
@@ -75,11 +75,11 @@ const UserSchema = new Schema(
     emailVerificationTokenExpires: Date
   },
   {
-    timestamps: true, // Ajoute automatiquement createdAt / updatedAt
+    timestamps: true, // Automatically adds createdAt / updatedAt
   }
 );
 
-// Index géospatial pour la recherche par localisation
+// Geospatial index for location-based search
 UserSchema.index({ location: "2dsphere" });
 
 export default model("User", UserSchema);

@@ -6,7 +6,11 @@ RUN corepack enable
 
 COPY . .
 
+
+ENV NODE_ENV=development
 RUN yarn install
+# RUN yarn install --frozen-lockfile
+
 
 WORKDIR /app/matcha-api
 

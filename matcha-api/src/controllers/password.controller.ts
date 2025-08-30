@@ -1,6 +1,37 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '@/models/User';
+import crypto from 'crypto';
+import { sendResetPasswordEmail } from '@/services/email';
+
+export const requestResetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400).json({ message: 'Email is required' });
+    return;
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    // Ne pas divulguer l’existence ou non de l’email pour éviter l’énumération
+    res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
+    return;
+  }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
+
+  user.resetPasswordToken = token;
+  user.resetPasswordTokenExpires = expires;
+  await user.save();
+
+  await sendResetPasswordEmail(user.email, token);
+
+  res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
+};
+
 
 export const resetPassword = async (req: Request, res: Response): Promise<void> => {
   const { token, newPassword } = req.body;

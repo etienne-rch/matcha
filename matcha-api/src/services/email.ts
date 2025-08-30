@@ -41,3 +41,29 @@ export const sendValidationEmail = async (to: string, token: string) => {
     console.log('📨 Preview URL:', nodemailer.getTestMessageUrl(info));
   }
 };
+
+export const sendResetPasswordEmail = async (to: string, token: string) => {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER!,
+        pass: process.env.SMTP_PASS!,
+    },
+  });
+
+  const link = `${process.env.FRONTEND_URL}/reset-password?token=${token}`; // Lien vers le front
+
+  const info = await transporter.sendMail({
+    from: '"Matcha" <no-reply@matcha.com>',
+    to,
+    subject: 'Réinitialisez votre mot de passe',
+    html: `<p>Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le lien suivant :</p>
+           <a href="${link}">${link}</a>`,
+  });
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`📩 Reset password preview: ${nodemailer.getTestMessageUrl(info)}`);
+  }
+};

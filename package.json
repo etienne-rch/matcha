@@ -41,6 +41,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "dependencies": {
+    "express-rate-limit": "^8.0.1",
     "json5": "^2.2.3"
   }
 }

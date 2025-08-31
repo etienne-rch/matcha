@@ -32,6 +32,7 @@ yarn install
 cp .env.example .env
 # Remplir .env avec les bonnes valeurs
 ```
+npm install express-rate-limit
 
 ---
 

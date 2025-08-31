@@ -14,7 +14,7 @@ app.use(express.json());
 app.use('/health', healthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api/password', passwordRoutes);
+app.use('/auth', passwordRoutes);
 
 
 // Middleware d'erreur (global)

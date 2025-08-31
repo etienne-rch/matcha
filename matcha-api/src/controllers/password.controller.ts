@@ -4,34 +4,6 @@ import User from '@/models/User';
 import crypto from 'crypto';
 import { sendResetPasswordEmail } from '@/services/email';
 
-export const requestResetPassword = async (req: Request, res: Response): Promise<void> => {
-  const { email } = req.body;
-
-  if (!email) {
-    res.status(400).json({ message: 'Email is required' });
-    return;
-  }
-
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    // Ne pas divulguer l’existence ou non de l’email pour éviter l’énumération
-    res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
-    return;
-  }
-
-  const token = crypto.randomBytes(32).toString('hex');
-  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
-
-  user.resetPasswordToken = token;
-  user.resetPasswordTokenExpires = expires;
-  await user.save();
-
-  await sendResetPasswordEmail(user.email, token);
-
-  res.status(200).json({ message: 'If that email exists, a reset link has been sent.' });
-};
-
 
 export const resetPassword = async (req: Request, res: Response): Promise<void> => {
   const { token, newPassword } = req.body;
@@ -66,4 +38,43 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
 
   // TODO : Invalider les sessions / JWT (si tu stockes côté DB ou utilise un refresh token)
   res.status(200).json({ message: 'Mot de passe modifié avec succès' });
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const genericMessage = 'Email envoyé si compte existant';
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email requis' });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({ message: genericMessage }); // Pas de leak
+    }
+
+    // Invalider l'ancien token s'il y a
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpires = undefined;
+    user.resetPasswordTokenUsed = false;
+
+    // Générer un token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 min
+
+    user.resetPasswordToken = token;
+    user.resetPasswordTokenExpires = expires;
+    user.resetPasswordTokenUsed = false;
+
+    await user.save();
+
+    await sendResetPasswordEmail(user.email, token);
+
+    return res.status(200).json({ message: genericMessage });
+  } catch (error) {
+    console.error('Erreur forgot-password:', error);
+    return res.status(500).json({ message: 'Erreur serveur' });
+  }
 };

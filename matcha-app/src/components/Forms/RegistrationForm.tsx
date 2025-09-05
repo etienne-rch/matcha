@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
@@ -6,29 +7,30 @@ import { styles } from '@/themes/styles';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function RegistrationForm() {
-  const [nom, setNom] = useState('');
-  const [prenom, setPrenom] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [firstname, setFirstname] = useState('');
   const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
+  const [password, setPassword] = useState('');
+  const navigation = useNavigation();
 
   const [errors, setErrors] = useState({
-    nom: '',
-    prenom: '',
+    firstname: '',
+    lastname: '',
     email: '',
-    motDePasse: '',
+    password: '',
   });
 
   const validateForm = () => {
     let valid = true;
-    let newErrors = { nom: '', prenom: '', email: '', motDePasse: '' };
+    let newErrors = { firstname: '', lastname: '', email: '', password: '' };
 
-    if (!nom.trim()) {
-      newErrors.nom = 'Le nom est requis';
+    if (!lastname.trim()) {
+      newErrors.lastname = 'Le nom est requis';
       valid = false;
     }
 
-    if (!prenom.trim()) {
-      newErrors.prenom = 'Le prénom est requis';
+    if (!firstname.trim()) {
+      newErrors.firstname = 'Le prénom est requis';
       valid = false;
     }
 
@@ -40,11 +42,11 @@ export default function RegistrationForm() {
       valid = false;
     }
 
-    if (!motDePasse.trim()) {
-      newErrors.motDePasse = 'Le mot de passe est requis';
+    if (!password.trim()) {
+      newErrors.password = 'Le mot de passe est requis';
       valid = false;
-    } else if (!validatePassword(motDePasse)) {
-      newErrors.motDePasse =
+    } else if (!validatePassword(password)) {
+      newErrors.password =
         'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
       valid = false;
     }
@@ -53,9 +55,27 @@ export default function RegistrationForm() {
     return valid;
   };
 
-  const handleRegister = () => {
-    if (validateForm()) {
-      console.log('Formulaire valide → Inscription...');
+  const handleRegister = async () => {
+    if (!validateForm()) {
+      console.info('Validation failed');
+    } else {
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName: firstname,
+          lastName: lastname,
+          consentAccepted: true,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          navigation.navigate('Login');
+        })
+        .catch((error) => console.error('Error:', error));
     }
   };
 
@@ -63,23 +83,27 @@ export default function RegistrationForm() {
     <View style={styles.inputContainer}>
       <TextInput
         label="Nom"
-        value={nom}
-        onChangeText={setNom}
+        value={lastname}
+        onChangeText={setLastname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.nom}
+        error={!!errors.lastname}
       />
-      {errors.nom && <HelperText type="error">{errors.nom}</HelperText>}
+      {errors.lastname && (
+        <HelperText type="error">{errors.lastname}</HelperText>
+      )}
 
       <TextInput
         label="Prénom"
-        value={prenom}
-        onChangeText={setPrenom}
+        value={firstname}
+        onChangeText={setFirstname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.prenom}
+        error={!!errors.firstname}
       />
-      {errors.prenom && <HelperText type="error">{errors.prenom}</HelperText>}
+      {errors.firstname && (
+        <HelperText type="error">{errors.firstname}</HelperText>
+      )}
 
       <TextInput
         label="Email"
@@ -95,15 +119,15 @@ export default function RegistrationForm() {
 
       <TextInput
         label="Mot de Passe"
-        value={motDePasse}
-        onChangeText={setMotDePasse}
+        value={password}
+        onChangeText={setPassword}
         mode="outlined"
         secureTextEntry
         style={styles.input}
-        error={!!errors.motDePasse}
+        error={!!errors.password}
       />
-      {errors.motDePasse && (
-        <HelperText type="error">{errors.motDePasse}</HelperText>
+      {errors.password && (
+        <HelperText type="error">{errors.password}</HelperText>
       )}
 
       <Button

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
@@ -7,16 +8,17 @@ import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
+  const [password, setMotDePasse] = useState('');
+  const navigation = useNavigation();
 
   const [errors, setErrors] = useState({
     email: '',
-    motDePasse: '',
+    password: '',
   });
 
   const validateForm = () => {
     let valid = true;
-    let newErrors = { email: '', motDePasse: '' };
+    let newErrors = { email: '', password: '' };
 
     if (!email.trim()) {
       newErrors.email = 'L’email est requis';
@@ -26,11 +28,11 @@ export default function LoginForm() {
       valid = false;
     }
 
-    if (!motDePasse.trim()) {
-      newErrors.motDePasse = 'Le mot de passe est requis';
+    if (!password.trim()) {
+      newErrors.password = 'Le mot de passe est requis';
       valid = false;
-    } else if (!validatePassword(motDePasse)) {
-      newErrors.motDePasse =
+    } else if (!validatePassword(password)) {
+      newErrors.password =
         'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
       valid = false;
     }
@@ -39,9 +41,24 @@ export default function LoginForm() {
     return valid;
   };
 
-  const handleLogin = () => {
-    if (validateForm()) {
-      console.log('Formulaire valide → Inscription...');
+  const handleLogin = async () => {
+    if (!validateForm()) {
+      console.info('Validation failed');
+    } else {
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          navigation.navigate('Home');
+        })
+        .catch((error) => console.error('Error:', error));
     }
   };
 
@@ -61,15 +78,15 @@ export default function LoginForm() {
 
       <TextInput
         label="Mot de Passe"
-        value={motDePasse}
+        value={password}
         onChangeText={setMotDePasse}
         mode="outlined"
         secureTextEntry
         style={styles.input}
-        error={!!errors.motDePasse}
+        error={!!errors.password}
       />
-      {errors.motDePasse && (
-        <HelperText type="error">{errors.motDePasse}</HelperText>
+      {errors.password && (
+        <HelperText type="error">{errors.password}</HelperText>
       )}
 
       <Button

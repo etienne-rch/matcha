@@ -46,11 +46,19 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Generate JWT valid for 24h
+    // const token = jwt.sign(
+    //   { id: user._id, email: user.email },
+    //   process.env.JWT_SECRET || "changeme",
+    //   { expiresIn: "24h" }
+    // );
+
+    // Generate JWT valid for 24h et stockés dans jwtVersion
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email, jwtVersion: user.jwtVersion },
       process.env.JWT_SECRET || "changeme",
       { expiresIn: "24h" }
     );
+    
 
     res.status(200).json({
       token,
@@ -211,11 +219,18 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
       });
     }
 
+    // const token = jwt.sign(
+    //   { id: user._id, email: user.email },
+    //   process.env.JWT_SECRET || "changeme",
+    //   { expiresIn: "24h" }
+    // );
+
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email, jwtVersion: user.jwtVersion },
       process.env.JWT_SECRET || "changeme",
       { expiresIn: "24h" }
     );
+    
 
     res.status(200).json({ token, user });
   } catch (error) {

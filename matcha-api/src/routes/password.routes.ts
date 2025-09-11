@@ -19,8 +19,3 @@ const forgotPasswordLimiter = rateLimit({
   router.post('/forgot-password', forgotPassword);
 
 export default router;
-
-
-
-
-

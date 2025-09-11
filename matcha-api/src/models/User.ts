@@ -81,6 +81,12 @@ const UserSchema = new Schema(
       default: false,
     },
 
+    jwtVersion: {
+      type: Number,
+      default: 0,
+    },
+    
+
   },
   {
     timestamps: true, // Automatically adds createdAt / updatedAt

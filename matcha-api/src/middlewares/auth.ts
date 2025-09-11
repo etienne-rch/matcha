@@ -5,6 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 
 interface JwtPayload {
   id: string;
+  jwtVersion: number;
 }
 
 export const requireAuth = (
@@ -32,3 +33,4 @@ export const requireAuth = (
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
+

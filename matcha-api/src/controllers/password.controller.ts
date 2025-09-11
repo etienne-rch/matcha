@@ -24,7 +24,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     }
   
     // Vérifier complexité du mot de passe
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
     if (!regex.test(newPassword)) {
       res.status(400).json({ message: 'Password does not meet complexity requirements' });
       return;
@@ -35,6 +35,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     user.resetPasswordTokenExpires = undefined;
     user.resetPasswordTokenUsed = true; // Marquer comme utilisé
   
+    user.jwtVersion += 1;
     await user.save();
   
     //nvalider les sessions / refresh tokens ici

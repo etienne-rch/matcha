@@ -1,4 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
+import { ParamListBase, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
@@ -9,7 +10,7 @@ import { validateEmail, validatePassword } from '@/utils/validation';
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setMotDePasse] = useState('');
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const [errors, setErrors] = useState({
     email: '',

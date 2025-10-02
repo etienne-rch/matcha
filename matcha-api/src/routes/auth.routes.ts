@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
-import { googleLogin, login } from '@/controllers/auth.controller';
+import { login } from '@/controllers/auth.controller';
+import { googleLogin } from '@/controllers/google.controller';
 import { loginValidator } from '@/middlewares/authValidators';
 
 const router = Router();

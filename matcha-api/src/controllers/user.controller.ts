@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
@@ -24,7 +24,7 @@ export const createUser = async (
       return;
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcryptjs.hash(password, 10);
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
 
     const user = new User({

@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "Node16",
+    "module": "CommonJS",
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "moduleResolution": "Node16",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "types": ["node", "jest"],
@@ -18,6 +18,5 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"],
-  "extends": "expo/tsconfig.base"
+  "exclude": ["node_modules", "dist"]
 }

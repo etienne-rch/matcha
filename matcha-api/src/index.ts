@@ -6,10 +6,11 @@ import { connectDB } from '@/config/db';
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
 
 connectDB().then(() => {
-  const server = app.listen(PORT, () => {
-    console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`🚀 Serveur lancé sur http://${HOST}:${PORT}`);
   });
 
   process.on('SIGINT', () => {

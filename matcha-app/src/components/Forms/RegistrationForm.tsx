@@ -1,37 +1,36 @@
-import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
+import { useAuth } from '@/hooks/useAuth';
 import { styles } from '@/themes/styles';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function RegistrationForm() {
-  const [lastname, setLastname] = useState('');
-  const [firstname, setFirstname] = useState('');
+  const [lastName, setLastname] = useState('');
+  const [firstName, setFirstname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const { register } = useAuth();
 
   const [errors, setErrors] = useState({
-    firstname: '',
-    lastname: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
   });
 
   const validateForm = () => {
     let valid = true;
-    let newErrors = { firstname: '', lastname: '', email: '', password: '' };
+    let newErrors = { firstName: '', lastName: '', email: '', password: '' };
 
-    if (!lastname.trim()) {
-      newErrors.lastname = 'Le nom est requis';
+    if (!lastName.trim()) {
+      newErrors.lastName = 'Le nom est requis';
       valid = false;
     }
 
-    if (!firstname.trim()) {
-      newErrors.firstname = 'Le prénom est requis';
+    if (!firstName.trim()) {
+      newErrors.firstName = 'Le prénom est requis';
       valid = false;
     }
 
@@ -60,50 +59,38 @@ export default function RegistrationForm() {
     if (!validateForm()) {
       console.info('Validation failed');
     } else {
-      fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName: firstname,
-          lastName: lastname,
-          consentAccepted: true,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          navigation.navigate('Login');
-        })
-        .catch((error) => console.error('Error:', error));
+      try {
+        register({ email, password, firstName, lastName });
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
   return (
     <View style={styles.inputContainer}>
       <TextInput
-        label="Nom"
-        value={lastname}
-        onChangeText={setLastname}
-        mode="outlined"
-        style={styles.input}
-        error={!!errors.lastname}
-      />
-      {errors.lastname && (
-        <HelperText type="error">{errors.lastname}</HelperText>
-      )}
-
-      <TextInput
         label="Prénom"
-        value={firstname}
+        value={firstName}
         onChangeText={setFirstname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.firstname}
+        error={!!errors.firstName}
       />
-      {errors.firstname && (
-        <HelperText type="error">{errors.firstname}</HelperText>
+      {errors.firstName && (
+        <HelperText type="error">{errors.firstName}</HelperText>
+      )}
+
+      <TextInput
+        label="Nom"
+        value={lastName}
+        onChangeText={setLastname}
+        mode="outlined"
+        style={styles.input}
+        error={!!errors.lastName}
+      />
+      {errors.lastName && (
+        <HelperText type="error">{errors.lastName}</HelperText>
       )}
 
       <TextInput

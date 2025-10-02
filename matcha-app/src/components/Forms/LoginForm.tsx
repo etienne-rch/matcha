@@ -1,16 +1,15 @@
-import { ParamListBase, useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
+import { useAuth } from '@/hooks/useAuth';
 import { styles } from '@/themes/styles';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setMotDePasse] = useState('');
-  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const { login } = useAuth();
 
   const [errors, setErrors] = useState({
     email: '',
@@ -46,20 +45,11 @@ export default function LoginForm() {
     if (!validateForm()) {
       console.info('Validation failed');
     } else {
-      fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          navigation.navigate('Home');
-        })
-        .catch((error) => console.error('Error:', error));
+      try {
+        login(email, password);
+      } catch (error) {
+        console.error('Error:', error);
+      }
     }
   };
 

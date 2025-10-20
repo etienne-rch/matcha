@@ -5,7 +5,7 @@ import authRoutes from '@/routes/auth.routes';
 import healthRoutes from '@/routes/health.routes';
 import profileRoutes from '@/routes/profile.route';
 import userRoutes from '@/routes/users.routes';
-import passwordRoutes from '@/routes/password.routes';
+
 
 const app = express();
 
@@ -23,7 +23,6 @@ app.use('/api/users', userRoutes);
 
 // Profile management routes
 app.use('/api/profile', profileRoutes);
-app.use('/auth', passwordRoutes);
 
 
 // Global error handling middleware

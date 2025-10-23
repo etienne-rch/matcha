@@ -2,33 +2,35 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 
+import { useAuth } from '@/hooks/useAuth';
 import { styles } from '@/themes/styles';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function RegistrationForm() {
-  const [nom, setNom] = useState('');
-  const [prenom, setPrenom] = useState('');
+  const [lastName, setLastname] = useState('');
+  const [firstName, setFirstname] = useState('');
   const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
+  const [password, setPassword] = useState('');
+  const { register } = useAuth();
 
   const [errors, setErrors] = useState({
-    nom: '',
-    prenom: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    motDePasse: '',
+    password: '',
   });
 
   const validateForm = () => {
     let valid = true;
-    let newErrors = { nom: '', prenom: '', email: '', motDePasse: '' };
+    let newErrors = { firstName: '', lastName: '', email: '', password: '' };
 
-    if (!nom.trim()) {
-      newErrors.nom = 'Le nom est requis';
+    if (!lastName.trim()) {
+      newErrors.lastName = 'Le nom est requis';
       valid = false;
     }
 
-    if (!prenom.trim()) {
-      newErrors.prenom = 'Le prénom est requis';
+    if (!firstName.trim()) {
+      newErrors.firstName = 'Le prénom est requis';
       valid = false;
     }
 
@@ -40,11 +42,11 @@ export default function RegistrationForm() {
       valid = false;
     }
 
-    if (!motDePasse.trim()) {
-      newErrors.motDePasse = 'Le mot de passe est requis';
+    if (!password.trim()) {
+      newErrors.password = 'Le mot de passe est requis';
       valid = false;
-    } else if (!validatePassword(motDePasse)) {
-      newErrors.motDePasse =
+    } else if (!validatePassword(password)) {
+      newErrors.password =
         'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
       valid = false;
     }
@@ -53,33 +55,43 @@ export default function RegistrationForm() {
     return valid;
   };
 
-  const handleRegister = () => {
-    if (validateForm()) {
-      console.log('Formulaire valide → Inscription...');
+  const handleRegister = async () => {
+    if (!validateForm()) {
+      console.info('Validation failed');
+    } else {
+      try {
+        register({ email, password, firstName, lastName });
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
   return (
     <View style={styles.inputContainer}>
       <TextInput
-        label="Nom"
-        value={nom}
-        onChangeText={setNom}
+        label="Prénom"
+        value={firstName}
+        onChangeText={setFirstname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.nom}
+        error={!!errors.firstName}
       />
-      {errors.nom && <HelperText type="error">{errors.nom}</HelperText>}
+      {errors.firstName && (
+        <HelperText type="error">{errors.firstName}</HelperText>
+      )}
 
       <TextInput
-        label="Prénom"
-        value={prenom}
-        onChangeText={setPrenom}
+        label="Nom"
+        value={lastName}
+        onChangeText={setLastname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.prenom}
+        error={!!errors.lastName}
       />
-      {errors.prenom && <HelperText type="error">{errors.prenom}</HelperText>}
+      {errors.lastName && (
+        <HelperText type="error">{errors.lastName}</HelperText>
+      )}
 
       <TextInput
         label="Email"
@@ -95,15 +107,15 @@ export default function RegistrationForm() {
 
       <TextInput
         label="Mot de Passe"
-        value={motDePasse}
-        onChangeText={setMotDePasse}
+        value={password}
+        onChangeText={setPassword}
         mode="outlined"
         secureTextEntry
         style={styles.input}
-        error={!!errors.motDePasse}
+        error={!!errors.password}
       />
-      {errors.motDePasse && (
-        <HelperText type="error">{errors.motDePasse}</HelperText>
+      {errors.password && (
+        <HelperText type="error">{errors.password}</HelperText>
       )}
 
       <Button

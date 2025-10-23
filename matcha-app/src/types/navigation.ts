@@ -4,3 +4,7 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
   ResetPassword: undefined;
 };
+
+export type CommonStackParamList = {
+  Home: undefined;
+};

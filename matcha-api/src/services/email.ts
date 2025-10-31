@@ -1,6 +1,42 @@
 import nodemailer from 'nodemailer';
 
+const getTransporter = async () => {
+  if (process.env.NODE_ENV === 'production') {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER!,
+        pass: process.env.SMTP_PASS!,
+      },
+    });
+  }
+  const testAccount = await nodemailer.createTestAccount();
+  return nodemailer.createTransport({
+    host: testAccount.smtp.host,
+    port: testAccount.smtp.port,
+    secure: testAccount.smtp.secure,
+    auth: { user: testAccount.user, pass: testAccount.pass },
+  });
+};
+
 export const sendValidationEmail = async (to: string, token: string) => {
+  const transporter = await getTransporter();
+  const link = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  const info = await transporter.sendMail({
+    from: '"Matcha" <no-reply@matcha.com>',
+    to,
+    subject: 'Verify your email address',
+    html: `<p>Welcome to Matcha! Please verify your email by clicking the link below:</p>
+           <a href="${link}">${link}</a>`,
+  });
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('📨 Preview URL:', nodemailer.getTestMessageUrl(info));
+  }
+};
+
+export const sendResetPasswordEmail = async (to: string, token: string) => {
   let transporter;
 
   if (process.env.NODE_ENV === 'production') {
@@ -26,18 +62,20 @@ export const sendValidationEmail = async (to: string, token: string) => {
     });
   }
 
-  const link = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
   const info = await transporter.sendMail({
     from: '"Matcha" <no-reply@matcha.com>',
     to,
-    subject: 'Verify your email address',
-    html: `<p>Welcome to Matcha! Please verify your email by clicking the link below:</p>
-           <a href="${link}">${link}</a>`,
+    subject: 'Reset your password',
+    html: `
+      <p>You requested to reset your password.</p>
+      <p>Click the link below to set a new password (valid 15 minutes):</p>
+      <a href="${resetLink}">${resetLink}</a>
+    `,
   });
 
-  // En dev : log le lien de prévisualisation Ethereal
   if (process.env.NODE_ENV !== 'production') {
-    console.log('📨 Preview URL:', nodemailer.getTestMessageUrl(info));
+    console.log('📨 Reset email preview:', nodemailer.getTestMessageUrl(info));
   }
 };

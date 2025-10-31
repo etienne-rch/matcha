@@ -5,8 +5,8 @@ import helmet from 'helmet';
 import { errorHandler } from '@/middlewares/error.middleware';
 import authRoutes from '@/routes/auth.routes';
 import healthRoutes from '@/routes/health.routes';
-import profileRoutes from '@/routes/profile.route';
-import userRoutes from '@/routes/users.routes';
+import profileRoutes from '@/routes/profile.routes';
+import userRoutes from '@/routes/user.routes';
 
 const app = express();
 

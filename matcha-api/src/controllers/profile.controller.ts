@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import ChatSession from '@/models/ChatSession';
 import CvParsing from '@/models/CvParsing';
@@ -13,17 +13,16 @@ import { mapUserToProfile } from '@/utils/mapUserToProfile';
 export const updateProfile = async (
   req: Request,
   res: Response,
-): Promise<void> => {
-  const userId = req.user?.id;
-
-  if (!userId) {
-    res.status(401).json({ message: 'Unauthorized' });
-    return;
-  }
-
-  const updateData: UserProfileUpdateInput = req.body;
-
+  next: NextFunction,
+) => {
   try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Missing or invalid token' });
+    }
+
+    const updateData: UserProfileUpdateInput = req.body;
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updateData },
@@ -31,57 +30,50 @@ export const updateProfile = async (
     ).select('-passwordHash');
 
     if (!updatedUser) {
-      res.status(404).json({ message: 'User not found' });
-      return;
+      return res.status(404).json({ message: 'User not found' });
     }
 
     const profile = mapUserToProfile(updatedUser);
     res.status(200).json({ message: 'Profile updated', user: profile });
   } catch (error) {
-    console.error('Error updating profile:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };
 
 export const getProfile = async (
   req: Request,
   res: Response,
-): Promise<void> => {
-  const userId = req.user?.id;
-
-  if (!userId) {
-    res.status(401).json({ message: 'Unauthorized' });
-    return;
-  }
-
+  next: NextFunction,
+) => {
   try {
-    const user = await User.findById(userId).select('-passwordHash');
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Missing or invalid token' });
+    }
 
+    const user = await User.findById(userId).select('-passwordHash');
     if (!user) {
-      res.status(404).json({ message: 'User not found' });
-      return;
+      return res.status(404).json({ message: 'User not found' });
     }
 
     const profile: UserProfile = mapUserToProfile(user);
     res.status(200).json({ user: profile });
-  } catch (err) {
-    console.error('Error fetching profile:', err);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const deleteAccount = async (
   req: Request,
   res: Response,
-): Promise<void> => {
-  const userId = req.user?.id;
-
-  if (!userId) {
-    res.status(401).json({ message: 'Unauthorized' });
-    return;
-  }
-
+  next: NextFunction,
+) => {
   try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Missing or invalid token' });
+    }
+
     await Promise.all([
       SkillsAssessment.deleteMany({ userId }),
       PersonalityTest.deleteMany({ userId }),
@@ -92,12 +84,10 @@ export const deleteAccount = async (
     ]);
 
     await User.findByIdAndDelete(userId);
-
     res
       .status(200)
-      .json({ message: 'Account and all related data deleted successfully' });
+      .json({ message: 'Account and related data deleted successfully' });
   } catch (error) {
-    console.error('Error deleting account:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    next(error);
   }
 };

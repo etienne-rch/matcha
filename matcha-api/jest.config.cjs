@@ -3,9 +3,12 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src/tests'],
+  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
+  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  clearMocks: true,
   testTimeout: 20000,
+  verbose: true,
 };

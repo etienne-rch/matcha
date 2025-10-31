@@ -8,7 +8,7 @@ import User from '@/models/User';
 describe('POST /api/users', () => {
   const basePayload = {
     email: 'alice@example.com',
-    password: 'SuperPass1!',
+    password: 'SuperPassword1!',
     firstName: 'Alice',
     lastName: 'Test',
     consentAccepted: true,
@@ -34,8 +34,9 @@ describe('POST /api/users', () => {
     const res = await request(app).post('/api/users').send(incompletePayload);
 
     expect(res.statusCode).toBe(400);
-    expect(res.body.message).toBe('Validation failed');
-    expect(res.body.errors).toHaveProperty('email');
+    expect(res.body.success).toBe(false);
+    expect(Array.isArray(res.body.errors)).toBe(true);
+    expect(res.body.errors.some((e: any) => e.path === 'email')).toBe(true);
   });
 
   it('should not allow duplicate email', async () => {
@@ -56,7 +57,8 @@ describe('POST /api/users', () => {
       });
 
     expect(res.statusCode).toBe(400);
-    expect(res.body.errors).toHaveProperty('email');
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors.some((e: any) => e.path === 'email')).toBe(true);
   });
 
   it('should return 400 for short password', async () => {
@@ -68,7 +70,8 @@ describe('POST /api/users', () => {
       });
 
     expect(res.statusCode).toBe(400);
-    expect(res.body.errors).toHaveProperty('password');
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors.some((e: any) => e.path === 'password')).toBe(true);
   });
 });
 
@@ -147,13 +150,13 @@ describe('GET /api/users/verify-email', () => {
     expect(res.body.message).toBe('Invalid or missing token');
   });
 
-  it('should return 400 for invalid token', async () => {
+  it('should return 404 for invalid token', async () => {
     const res = await request(app).get('/api/users/verify-email?token=invalid');
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
     expect(res.body.message).toBe('Invalid or expired token');
   });
 
-  it('should return 400 for expired token', async () => {
+  it('should return 404 for expired token', async () => {
     await User.create({
       email: 'expired@example.com',
       passwordHash: 'hashed',
@@ -165,7 +168,7 @@ describe('GET /api/users/verify-email', () => {
     const res = await request(app).get(
       `/api/users/verify-email?token=${token}`,
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
     expect(res.body.message).toBe('Invalid or expired token');
   });
 });

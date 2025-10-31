@@ -1,4 +1,6 @@
+import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
 
 import { errorHandler } from '@/middlewares/error.middleware';
 import authRoutes from '@/routes/auth.routes';
@@ -8,22 +10,15 @@ import userRoutes from '@/routes/users.routes';
 
 const app = express();
 
-// Middleware to parse JSON BEFORE the routes
 app.use(express.json());
+app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
+app.use(helmet());
 
-// Authentication routes
-app.use("/api/auth", authRoutes);
-
-// Health route (for monitoring)
+app.use('/api/auth', authRoutes);
 app.use('/health', healthRoutes);
-
-// User management routes
 app.use('/api/users', userRoutes);
-
-// Profile management routes
 app.use('/api/profile', profileRoutes);
 
-// Global error handling middleware
 app.use(errorHandler);
 
 export default app;

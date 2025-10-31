@@ -7,27 +7,23 @@ dotenv.config({ path: '.env.test' });
 let mongo: MongoMemoryServer;
 
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create({
-    binary: { version: '7.0.14' },
-  });
-
+  mongo = await MongoMemoryServer.create();
   const uri = mongo.getUri();
-  await mongoose.connect(uri);
 
-  console.log(`🧪 MongoDB en mémoire lancée sur ${uri}`);
+  await mongoose.connect(uri);
+  mongoose.set('strictQuery', true);
+
+  if (process.env.NODE_ENV !== 'ci') {
+    console.log(`🧪 MongoDB mémoire lancée : ${uri}`);
+  }
 });
 
 afterEach(async () => {
   const db = mongoose.connection.db;
-  if (!db) {
-    console.warn('⚠️ Aucune connexion DB disponible dans afterEach');
-    return;
-  }
+  if (!db) return;
 
   const collections = await db.collections();
-  for (const collection of collections) {
-    await collection.deleteMany({});
-  }
+  await Promise.all(collections.map((c) => c.deleteMany({})));
 });
 
 afterAll(async () => {
@@ -35,5 +31,7 @@ afterAll(async () => {
   if (mongo) {
     await mongo.stop();
   }
-  console.log('🧹 MongoMemoryServer arrêté proprement');
+  if (process.env.NODE_ENV !== 'ci') {
+    console.log('🧹 MongoMemoryServer arrêté proprement');
+  }
 });

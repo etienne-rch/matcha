@@ -1,17 +1,11 @@
-import { Router } from "express";
-import { body } from "express-validator";
-import { login } from "@/controllers/user.controller";
-import { googleLogin } from "@/controllers/user.controller";
-import { loginValidator } from "@/middlewares/authValidators";
+import { Router } from 'express';
+
+import { login } from '@/controllers/auth.controller';
+import { validate } from '@/middlewares/validate.middleware';
+import { loginSchema } from '@/validators/login.schema';
 
 const router = Router();
 
-/**
- * Endpoint: POST /api/auth/login
- * Validates the input data and calls the login controller
- */
-router.post("/login", loginValidator, login);
-
-router.post("/google", googleLogin);
+router.post('/login', validate(loginSchema), login);
 
 export default router;

@@ -1,41 +1,31 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 
 import app from '@/app';
-import { connectDB, mongoClient } from '@/config/db';
-
-dotenv.config();
+import { connectDB } from '@/config/db';
 
 const PORT = process.env.PORT || 3000;
 
-let server: ReturnType<typeof app.listen>;
-
-connectDB().then(() => {
-  server = app.listen(PORT, () => {
-    console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
-  });
-});
-
-const gracefulShutdown = async () => {
-  console.log('\n🛑 Fermeture du serveur en cours...');
-
+(async () => {
   try {
-    await mongoClient.close();
-    console.log('✅ Connexion MongoDB fermée');
-  } catch (error) {
-    console.warn('⚠️ Erreur lors de la fermeture de MongoDB :', error);
-  }
+    await connectDB();
+    const server = app.listen(PORT, () => {
+      console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
+    });
 
-  setTimeout(() => {
-    if (server) {
+    process.on('SIGINT', () => {
+      console.log('\n🛑 Fermeture du serveur...');
       server.close(() => {
         console.log('✅ Serveur arrêté proprement');
         process.exit(0);
       });
-    } else {
-      process.exit(0);
-    }
-  }, 3000);
-};
+    });
 
-process.on('SIGINT', gracefulShutdown);
-process.on('SIGTERM', gracefulShutdown);
+    process.on('unhandledRejection', (err) => {
+      console.error('💥 Rejet non géré :', err);
+      process.exit(1);
+    });
+  } catch (err) {
+    console.error('❌ Impossible de démarrer le serveur :', err);
+    process.exit(1);
+  }
+})();

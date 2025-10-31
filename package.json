@@ -1,18 +1,25 @@
 {
   "name": "matcha-monorepo",
+  "type": "commonjs",
   "private": true,
   "workspaces": [
     "matcha-app",
     "matcha-api"
   ],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "yarn mongo:start && turbo run dev",
+    "dev:api": "yarn mongo:start && turbo run dev --filter=matcha-api",
+    "dev:app": "turbo run dev --filter=matcha-app",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "prepare": "husky install",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "prepare": "husky install",
+    "mongo:start": "docker compose up -d mongo",
+    "mongo:stop": "docker compose stop mongo",
+    "mongo:logs": "docker compose logs -f mongo",
+    "down": "docker compose down"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
@@ -30,13 +37,11 @@
     "turbo": "2.5.4"
   },
   "lint-staged": {
-    "matcha-app/**/*.{ts,tsx}": [
-      "cd matcha-app && eslint . --ext .ts,.tsx --fix"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
     ],
-    "matcha-api/**/*.{ts,tsx}": [
-      "cd matcha-api && eslint . --ext .ts,.tsx --fix"
-    ],
-    "**/*.{json,md}": [
+    "*.{json,md}": [
       "prettier --write"
     ]
   },

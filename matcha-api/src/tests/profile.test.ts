@@ -1,0 +1,123 @@
+import jwt from 'jsonwebtoken';
+import request from 'supertest';
+
+import app from '@/app';
+import User from '@/models/User';
+
+const BASE_URL = '/api/profile';
+
+const createUserAndGetToken = async () => {
+  const uniqueEmail = `test-${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 8)}@example.com`;
+
+  const res = await request(app).post('/api/users').send({
+    firstName: 'Test',
+    lastName: 'User',
+    email: uniqueEmail,
+    password: 'StrongPassw0rd!',
+    consentAccepted: true,
+  });
+
+  const user = await User.findById(res.body.userId);
+  if (!user) throw new Error('User not found');
+
+  user.isEmailVerified = true;
+  await user.save();
+
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET || 'test-secret',
+  );
+
+  return { token };
+};
+
+describe('PATCH /api/profile', () => {
+  it('should update user profile successfully', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const payload = {
+      birthYear: 1990,
+      gender: 'male',
+      jobTypes: ['frontend', 'backend'],
+      locationPref: 'remote',
+      remote: true,
+      addressCity: 'Paris',
+    };
+
+    const res = await request(app)
+      .patch(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send(payload);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe('Profile updated');
+    expect(res.body.user.gender).toBe('male');
+    expect(res.body.user.addressCity).toBe('Paris');
+  });
+
+  it('should return 401 if no token is provided', async () => {
+    const res = await request(app).patch(BASE_URL).send({});
+    expect(res.status).toBe(401);
+    expect(res.body.message).toMatch(/missing/i);
+  });
+
+  it('should reject invalid gender value', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const res = await request(app)
+      .patch(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ gender: 'invalid' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors.some((e: any) => e.path === 'gender')).toBe(true);
+  });
+
+  it('should reject invalid coordinates', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const res = await request(app)
+      .patch(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        location: {
+          type: 'Point',
+          coordinates: ['not', 'valid'],
+        },
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(
+      res.body.errors.some((e: any) => e.path.includes('coordinates')),
+    ).toBe(true);
+  });
+});
+
+describe('DELETE /api/profile/account', () => {
+  it('should delete the user account and related data', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const userBefore = await User.findOne({});
+    expect(userBefore).not.toBeNull();
+
+    const res = await request(app)
+      .delete(`${BASE_URL}/account`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toMatch(/deleted/i);
+
+    const userAfter = await User.findById(userBefore!._id);
+    expect(userAfter).toBeNull();
+  });
+
+  it('should return 401 if no token is provided', async () => {
+    const res = await request(app).delete(`${BASE_URL}/account`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toMatch(/missing/i);
+  });
+});

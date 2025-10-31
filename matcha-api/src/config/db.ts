@@ -1,29 +1,29 @@
-import dotenv from 'dotenv';
-import { Db, MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 
-dotenv.config();
+const { MONGODB_URI, MONGODB_DB, MONGODB_DB_TEST, NODE_ENV } = process.env;
 
-const uri = process.env.MONGODB_URI!;
-const dbName = process.env.MONGODB_DB || 'matcha_dev';
+const dbName =
+  NODE_ENV === 'test'
+    ? MONGODB_DB_TEST || 'matcha_test'
+    : MONGODB_DB || 'matcha_dev';
 
-export const mongoClient = new MongoClient(uri);
-
-let db: Db;
+const baseUri = MONGODB_URI?.endsWith('/')
+  ? MONGODB_URI.slice(0, -1)
+  : MONGODB_URI;
+const uri = `${baseUri}/${dbName}`;
 
 export const connectDB = async (): Promise<void> => {
   try {
-    await mongoClient.connect();
-    db = mongoClient.db(dbName);
-    console.log(`✅ MongoDB connecté sur ${dbName}`);
+    mongoose.set('strictQuery', true);
+    await mongoose.connect(uri);
+    console.log(`✅ MongoDB connecté à "${dbName}"`);
   } catch (error) {
-    console.error('❌ Erreur de connexion à MongoDB :', error);
+    console.error('❌ Erreur de connexion MongoDB :', error);
     process.exit(1);
   }
 };
 
-export const getDB = (): Db => {
-  if (!db) {
-    throw new Error('❌ Base de données non connectée.');
-  }
-  return db;
+export const disconnectDB = async (): Promise<void> => {
+  await mongoose.connection.close();
+  console.log('🛑 Déconnexion MongoDB');
 };

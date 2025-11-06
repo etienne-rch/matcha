@@ -20,3 +20,8 @@ export async function getUserById(id: string) {
   const response = await api.get(`/api/users/${id}`);
   return response.data;
 }
+
+export async function deleteAccount() {
+  const response = await api.delete('/api/profile/account');
+  return response.data;
+}

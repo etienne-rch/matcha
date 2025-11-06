@@ -2,6 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import React, { createContext, useEffect, useState } from 'react';
 
 import {
+  deleteAccount as apiDeleteAccount,
   login as apiLogin,
   register as apiRegister,
   getUserById,
@@ -19,6 +20,7 @@ interface AuthContextType {
     firstName: string;
     lastName: string;
   }) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -102,8 +104,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUser(null);
   };
 
+  const deleteAccount = async () => {
+    try {
+      await apiDeleteAccount();
+      await removeToken();
+      setUser(null);
+    } catch (error) {
+      console.error('[AuthContext] Delete account error:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, deleteAccount }}
+    >
       {children}
     </AuthContext.Provider>
   );

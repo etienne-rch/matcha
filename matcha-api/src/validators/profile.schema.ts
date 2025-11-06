@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { passwordSchema } from './password.schema';
+
 export const updateProfileSchema = z
   .object({
     birthYear: z
@@ -32,3 +34,9 @@ export const updateProfileSchema = z
       .optional(),
   })
   .strict();
+
+export const changePasswordSchema = z.object({
+  oldPassword: z.string().min(1, { message: 'Old password is required' }),
+  newPassword: passwordSchema,
+  confirmNewPassword: z.string(),
+});

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { styles } from '@/themes/styles';
@@ -9,6 +10,8 @@ import { validateEmail, validatePassword } from '@/utils/validation';
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setMotDePasse] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
   const [errors, setErrors] = useState({
@@ -43,13 +46,33 @@ export default function LoginForm() {
 
   const handleLogin = async () => {
     if (!validateForm()) {
-      console.info('Validation failed');
-    } else {
-      try {
-        login(email, password);
-      } catch (error) {
-        console.error('Error:', error);
-      }
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(email, password);
+      Toast.show({
+        type: 'success',
+        text1: 'Connexion réussie',
+        text2: 'Bienvenue !',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } catch (_error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Échec de la connexion',
+        text2: 'Veuillez réessayer',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,6 +87,7 @@ export default function LoginForm() {
         autoCapitalize="none"
         style={styles.input}
         error={!!errors.email}
+        disabled={loading}
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
@@ -72,9 +96,16 @@ export default function LoginForm() {
         value={password}
         onChangeText={setMotDePasse}
         mode="outlined"
-        secureTextEntry
+        secureTextEntry={!showPassword}
         style={styles.input}
         error={!!errors.password}
+        disabled={loading}
+        right={
+          <TextInput.Icon
+            icon={showPassword ? 'eye-off' : 'eye'}
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
       />
       {errors.password && (
         <HelperText type="error">{errors.password}</HelperText>
@@ -84,6 +115,8 @@ export default function LoginForm() {
         mode="contained"
         onPress={handleLogin}
         style={styles.continueButton}
+        loading={loading}
+        disabled={loading}
       >
         Continuer
       </Button>

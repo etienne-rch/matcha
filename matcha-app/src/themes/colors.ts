@@ -6,7 +6,8 @@ const Colors = {
   secondary: '#f5ede2',
   background: '#ffffff',
   surface: '#ffffff',
-  error: '#b00020',
+  success: '#2DAC5C',
+  error: '#DC2626',
   grey: '#121212',
   brown: {
     normal: '#edac7b',

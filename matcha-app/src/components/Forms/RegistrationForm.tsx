@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { styles } from '@/themes/styles';
@@ -11,6 +12,8 @@ export default function RegistrationForm() {
   const [firstName, setFirstname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { register } = useAuth();
 
   const [errors, setErrors] = useState({
@@ -57,13 +60,33 @@ export default function RegistrationForm() {
 
   const handleRegister = async () => {
     if (!validateForm()) {
-      console.info('Validation failed');
-    } else {
-      try {
-        register({ email, password, firstName, lastName });
-      } catch (error) {
-        console.error(error);
-      }
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await register({ email, password, firstName, lastName });
+      Toast.show({
+        type: 'success',
+        text1: 'Inscription réussie',
+        text2: 'Vérifiez votre email pour confirmer votre compte',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } catch (_error) {
+      Toast.show({
+        type: 'error',
+        text1: "Échec de l'inscription",
+        text2: 'Veuillez réessayer',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,6 +99,7 @@ export default function RegistrationForm() {
         mode="outlined"
         style={styles.input}
         error={!!errors.firstName}
+        disabled={loading}
       />
       {errors.firstName && (
         <HelperText type="error">{errors.firstName}</HelperText>
@@ -88,6 +112,7 @@ export default function RegistrationForm() {
         mode="outlined"
         style={styles.input}
         error={!!errors.lastName}
+        disabled={loading}
       />
       {errors.lastName && (
         <HelperText type="error">{errors.lastName}</HelperText>
@@ -102,6 +127,7 @@ export default function RegistrationForm() {
         autoCapitalize="none"
         style={styles.input}
         error={!!errors.email}
+        disabled={loading}
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
@@ -110,9 +136,16 @@ export default function RegistrationForm() {
         value={password}
         onChangeText={setPassword}
         mode="outlined"
-        secureTextEntry
+        secureTextEntry={!showPassword}
         style={styles.input}
         error={!!errors.password}
+        disabled={loading}
+        right={
+          <TextInput.Icon
+            icon={showPassword ? 'eye-off' : 'eye'}
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
       />
       {errors.password && (
         <HelperText type="error">{errors.password}</HelperText>
@@ -122,6 +155,8 @@ export default function RegistrationForm() {
         mode="contained"
         onPress={handleRegister}
         style={styles.continueButton}
+        loading={loading}
+        disabled={loading}
       >
         Continuer
       </Button>

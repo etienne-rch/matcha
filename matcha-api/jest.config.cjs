@@ -5,7 +5,7 @@ module.exports = {
   roots: ['<rootDir>/src/tests'],
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   clearMocks: true,

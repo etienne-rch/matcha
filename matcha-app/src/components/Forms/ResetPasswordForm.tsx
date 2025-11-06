@@ -1,25 +1,19 @@
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { styles } from '@/themes/styles';
-import { AuthStackParamList } from '@/types/navigation';
 import { validatePassword } from '@/utils/validation';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
-
 export default function ResetPasswordForm() {
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const navigation = useNavigation<NavigationProp>();
 
   const handleSubmit = () => {
-    if (!password || !confirm) {
+    if (!currentPassword || !password || !confirm) {
       setError('Tous les champs sont requis');
       return;
     }
@@ -34,21 +28,26 @@ export default function ResetPasswordForm() {
       return;
     }
     setError('');
-    setSuccess(true);
     Toast.show({
       type: 'success',
       text1: 'Mot de passe modifié avec succès',
-      text2: "Vous allez être redirigé vers l'écran de connexion",
       position: 'top',
       visibilityTime: 3000,
     });
-    setTimeout(() => {
-      navigation.navigate('Login');
-    }, 3000);
+    // Appel API pour modifier le mot de passe
   };
 
   return (
     <View style={styles.inputContainer}>
+      <TextInput
+        label="Mot de passe actuel"
+        value={currentPassword}
+        onChangeText={setCurrentPassword}
+        mode="outlined"
+        secureTextEntry
+        style={styles.input}
+        error={!!error}
+      />
       <TextInput
         label="Nouveau mot de passe"
         value={password}
@@ -73,7 +72,7 @@ export default function ResetPasswordForm() {
         onPress={handleSubmit}
         style={styles.continueButton}
       >
-        Réinitialiser
+        Modifier le mot de passe
       </Button>
     </View>
   );

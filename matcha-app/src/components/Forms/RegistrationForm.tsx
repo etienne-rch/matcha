@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
@@ -5,9 +7,13 @@ import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { styles } from '@/themes/styles';
+import { AuthStackParamList } from '@/types/navigation';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
+type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
+
 export default function RegistrationForm() {
+  const navigation = useNavigation<NavigationProp>();
   const [lastName, setLastname] = useState('');
   const [firstName, setFirstname] = useState('');
   const [email, setEmail] = useState('');
@@ -22,6 +28,14 @@ export default function RegistrationForm() {
     email: '',
     password: '',
   });
+
+  const resetForm = () => {
+    setFirstname('');
+    setLastname('');
+    setEmail('');
+    setPassword('');
+    setErrors({ firstName: '', lastName: '', email: '', password: '' });
+  };
 
   const validateForm = () => {
     let valid = true;
@@ -66,6 +80,7 @@ export default function RegistrationForm() {
     setLoading(true);
     try {
       await register({ email, password, firstName, lastName });
+      resetForm();
       Toast.show({
         type: 'success',
         text1: 'Inscription réussie',
@@ -75,7 +90,11 @@ export default function RegistrationForm() {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-    } catch (_error) {
+      // Redirection vers l'écran de connexion après un court délai
+      setTimeout(() => {
+        navigation.navigate('Login');
+      }, 1000);
+    } catch {
       Toast.show({
         type: 'error',
         text1: "Échec de l'inscription",

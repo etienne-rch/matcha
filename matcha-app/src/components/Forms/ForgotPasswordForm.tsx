@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
+import { requestPasswordReset } from '@/api/auth';
 import { ForgotPasswordFormProps } from '@/components/Forms/types';
 import { styles } from '@/themes/styles';
 import { validateEmail } from '@/utils/validation';
@@ -16,11 +17,11 @@ export default function ForgotPasswordForm({
 
   const handleSubmit = async () => {
     if (!email.trim()) {
-      setError('L’email est requis');
+      setError("L'email est requis");
       return;
     }
     if (!validateEmail(email)) {
-      setError('Format d’email invalide');
+      setError("Format d'email invalide");
       return;
     }
 
@@ -28,8 +29,7 @@ export default function ForgotPasswordForm({
     setLoading(true);
 
     try {
-      // TODO: appel API pour envoyer l'email de réinitialisation
-      // await forgotPasswordAPI(email);
+      await requestPasswordReset(email);
 
       setSent(true);
       Toast.show({
@@ -41,11 +41,13 @@ export default function ForgotPasswordForm({
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-    } catch (_error) {
+    } catch (err) {
+      const errorMessage =
+        (err as any)?.response?.data?.message || 'Veuillez réessayer';
       Toast.show({
         type: 'error',
         text1: "Échec de l'envoi",
-        text2: 'Veuillez réessayer',
+        text2: errorMessage,
         position: 'top',
         visibilityTime: 5000,
         autoHide: true,

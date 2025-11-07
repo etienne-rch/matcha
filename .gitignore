@@ -53,6 +53,7 @@ Thumbs.db
 # Local env
 .env
 .env*.local
+.env.*
 
 # Mongo
 */data/mongo

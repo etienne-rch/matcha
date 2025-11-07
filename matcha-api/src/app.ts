@@ -7,6 +7,7 @@ import authRoutes from '@/routes/auth.routes';
 import healthRoutes from '@/routes/health.routes';
 import personalityRoutes from '@/routes/personality.routes';
 import profileRoutes from '@/routes/profile.routes';
+import redirectRoutes from '@/routes/redirect.routes';
 import userRoutes from '@/routes/user.routes';
 
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/health', healthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api', redirectRoutes);
 app.use('/api/personality', personalityRoutes);
 
 app.use(errorHandler);

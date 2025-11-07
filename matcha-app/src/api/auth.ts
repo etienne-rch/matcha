@@ -25,3 +25,16 @@ export async function deleteAccount() {
   const response = await api.delete('/api/profile/account');
   return response.data;
 }
+
+export async function requestPasswordReset(email: string) {
+  const response = await api.post('/api/auth/request-reset', { email });
+  return response.data;
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  const response = await api.post('/api/auth/reset-password', {
+    token,
+    newPassword,
+  });
+  return response.data;
+}

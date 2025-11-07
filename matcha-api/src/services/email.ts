@@ -23,7 +23,7 @@ const getTransporter = async () => {
 
 export const sendValidationEmail = async (to: string, token: string) => {
   const transporter = await getTransporter();
-  const link = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+  const link = `${process.env.API_URL || 'http://localhost:3000'}/api/users/verify-email?token=${token}`;
   const info = await transporter.sendMail({
     from: '"Matcha" <no-reply@matcha.com>',
     to,

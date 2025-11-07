@@ -31,6 +31,13 @@ export const login = async (
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        message:
+          'Please verify your email address before logging in. Check your inbox for the verification link.',
+      });
+    }
+
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET || 'changeme',

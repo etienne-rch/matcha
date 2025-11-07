@@ -13,7 +13,7 @@ beforeEach(async () => {
     firstName: 'John',
     lastName: 'Doe',
     consentAccepted: true,
-    isEmailVerified: true, // Email vérifié pour permettre la connexion
+    isEmailVerified: true,
   });
 });
 
@@ -38,7 +38,6 @@ describe('POST /api/auth/login', () => {
   });
 
   it('should return 403 for unverified email', async () => {
-    // Créer un utilisateur non vérifié
     const passwordHash = await bcrypt.hash('Password123!', 10);
     await User.create({
       email: 'unverified@example.com',
@@ -46,7 +45,7 @@ describe('POST /api/auth/login', () => {
       firstName: 'Unverified',
       lastName: 'User',
       consentAccepted: true,
-      isEmailVerified: false, // Email non vérifié
+      isEmailVerified: false,
     });
 
     const res = await request(app)

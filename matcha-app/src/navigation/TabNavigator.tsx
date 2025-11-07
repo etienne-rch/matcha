@@ -24,6 +24,7 @@ export default function TabNavigator() {
           ),
         }}
       />
+
       <Tab.Screen
         name="Déconnexion"
         component={LogoutScreen}

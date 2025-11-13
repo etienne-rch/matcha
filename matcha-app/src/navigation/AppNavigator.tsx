@@ -19,7 +19,7 @@ const linking = {
         },
       },
       Home: 'home',
-      Deconnexion: 'logout',
+      Logout: 'logout',
     },
   },
 };

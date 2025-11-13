@@ -3,6 +3,7 @@ import { DefaultTheme } from 'react-native-paper';
 const Colors = {
   ...DefaultTheme.colors,
   primary: '#0A2916',
+  avatarBackground: '#cbd5e1',
   secondary: '#f5ede2',
   background: '#ffffff',
   surface: '#ffffff',

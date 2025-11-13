@@ -12,7 +12,7 @@ export default function LogoutScreen() {
     useCallback(() => {
       const showConfirm = () => {
         Alert.alert(
-          'Deconnexion',
+          'Déconnexion',
           'Voulez-vous vraiment vous déconnecter ?',
           [
             {

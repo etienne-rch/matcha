@@ -14,7 +14,8 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write .",
     "test": "NODE_ENV=test jest --runInBand --detectOpenHandles",
-    "cleanup:users": "ts-node scripts/cleanup-unverified-users.ts --once"
+    "cleanup:users": "ts-node scripts/cleanup-unverified-users.ts --once",
+    "seed:personality": "ts-node src/scripts/seed-personality.ts"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.46.2",

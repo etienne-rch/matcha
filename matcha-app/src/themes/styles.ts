@@ -100,6 +100,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
   },
+  deleteAccountText: {
+    color: rnpTheme.colors.error,
+    textDecorationLine: 'underline',
+    fontSize: rnpTheme.fontSize.base,
+  },
+  deleteAccountButton: {
+    alignSelf: 'center',
+    paddingHorizontal: rnpTheme.spacing.sm,
+    backgroundColor: 'transparent',
+  },
 });
 
 export { styles };

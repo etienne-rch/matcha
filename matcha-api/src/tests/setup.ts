@@ -4,6 +4,11 @@ import mongoose from 'mongoose';
 
 dotenv.config({ path: '.env.test' });
 
+jest.mock('@/services/email', () => ({
+  sendValidationEmail: jest.fn().mockResolvedValue(undefined),
+  sendResetPasswordEmail: jest.fn().mockResolvedValue(undefined),
+}));
+
 let mongo: MongoMemoryServer;
 
 beforeAll(async () => {

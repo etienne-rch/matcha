@@ -11,11 +11,13 @@ const createUserAndGetToken = async () => {
     .toString(36)
     .substring(2, 8)}@example.com`;
 
+  const password = 'StrongPassw0rd!';
+
   const res = await request(app).post('/api/users').send({
     firstName: 'Test',
     lastName: 'User',
     email: uniqueEmail,
-    password: 'StrongPassw0rd!',
+    password,
     consentAccepted: true,
   });
 
@@ -30,7 +32,7 @@ const createUserAndGetToken = async () => {
     process.env.JWT_SECRET || 'test-secret',
   );
 
-  return { token };
+  return { token, password };
 };
 
 describe('PATCH /api/profile', () => {
@@ -117,6 +119,95 @@ describe('DELETE /api/profile/account', () => {
 
   it('should return 401 if no token is provided', async () => {
     const res = await request(app).delete(`${BASE_URL}/account`);
+    expect(res.status).toBe(401);
+    expect(res.body.message).toMatch(/missing/i);
+  });
+});
+
+describe('POST /api/profile/change-password', () => {
+  it('should change the password successfully when inputs are valid', async () => {
+    const { token, password } = await createUserAndGetToken();
+
+    const payload = {
+      oldPassword: password,
+      newPassword: 'NewPassw0rd!',
+      confirmNewPassword: 'NewPassw0rd!',
+    };
+
+    const res = await request(app)
+      .post(`${BASE_URL}/change-password`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(payload);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toMatch(/password updated/i);
+  });
+
+  it('should return 400 if old password is incorrect', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const payload = {
+      oldPassword: 'WrongOldPass!',
+      newPassword: 'AnotherPassw0rd!',
+      confirmNewPassword: 'AnotherPassw0rd!',
+    };
+
+    const res = await request(app)
+      .post(`${BASE_URL}/change-password`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(payload);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/old password is incorrect/i);
+  });
+
+  it('should return 400 if new password is the same as the current one', async () => {
+    const { token, password } = await createUserAndGetToken();
+
+    const payload = {
+      oldPassword: password,
+      newPassword: password,
+      confirmNewPassword: password,
+    };
+
+    const res = await request(app)
+      .post(`${BASE_URL}/change-password`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(payload);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/different from the current password/i);
+  });
+
+  it('should return 400 if new passwords do not match', async () => {
+    const { token, password } = await createUserAndGetToken();
+
+    const payload = {
+      oldPassword: password,
+      newPassword: 'NewPass123!',
+      confirmNewPassword: 'MismatchPass123!',
+    };
+
+    const res = await request(app)
+      .post(`${BASE_URL}/change-password`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(payload);
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/do not match/i);
+  });
+
+  it('should return 401 if no token is provided', async () => {
+    const payload = {
+      oldPassword: 'OldPass123!',
+      newPassword: 'NewPass123!',
+      confirmNewPassword: 'NewPass123!',
+    };
+
+    const res = await request(app)
+      .post(`${BASE_URL}/change-password`)
+      .send(payload);
+
     expect(res.status).toBe(401);
     expect(res.body.message).toMatch(/missing/i);
   });

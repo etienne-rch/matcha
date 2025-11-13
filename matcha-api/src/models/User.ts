@@ -1,11 +1,8 @@
-import { Schema, Types, model } from "mongoose";
+import { Schema, Types, model } from 'mongoose';
 
-/**
- * User model based on the USERS structure from your schema (MongoDB style).
- * Each field directly corresponds to a column in the diagram.
- */
 const UserSchema = new Schema(
   {
+    // Identité
     email: {
       type: String,
       required: true,
@@ -13,49 +10,48 @@ const UserSchema = new Schema(
       lowercase: true,
       trim: true,
     },
-
-    passwordHash: { type: String, required: false },
-
+    passwordHash: {
+      type: String,
+      required: true,
+    },
     firstName: { type: String, trim: true },
     lastName: { type: String, trim: true },
 
-    birthYear: { type: Number },
-
+    // Données personnelles
+    birthYear: Number,
     gender: {
       type: String,
-      enum: ["male", "female", "other", "undisclosed"],
+      enum: ['male', 'female', 'other', 'undisclosed'],
     },
-
     subscription: {
       type: String,
-      enum: ["free", "premium"],
-      default: "free",
+      enum: ['free', 'premium'],
+      default: 'free',
     },
 
+    // Emploi & localisation
     jobTypes: [{ type: String, trim: true }],
+    locationPref: { type: String, enum: ['remote', 'hybrid', 'on-site'] },
+    remote: Boolean,
 
-    locationPref: {
-      type: String,
-      enum: ["remote", "hybrid", "on-site"],
-    },
+    avatarUrl: String,
+    avatarPublicId: String,
+    avatarUploadedAt: Date,
 
-    remote: { type: Boolean },
-
-    avatarUrl: { type: String },
-    avatarPublicId: { type: String },
-    avatarUploadedAt: { type: Date },
-
+    // Consentement RGPD
     consentAccepted: { type: Boolean, required: true },
-    consentTimestamp: { type: Date },
+    consentTimestamp: Date,
 
-    personalityTestId: { type: Types.ObjectId, ref: "PersonalityTest" },
-    skillsAssessmentId: { type: Types.ObjectId, ref: "SkillsAssessment" },
+    // Relations
+    personalityTestId: { type: Types.ObjectId, ref: 'PersonalityTest' },
+    skillsAssessmentId: { type: Types.ObjectId, ref: 'SkillsAssessment' },
 
+    // Géolocalisation
     location: {
       type: {
         type: String,
-        enum: ["Point"],
-        default: "Point",
+        enum: ['Point'],
+        default: 'Point',
         required: true,
       },
       coordinates: {
@@ -65,21 +61,25 @@ const UserSchema = new Schema(
       },
     },
 
-    addressStreet: { type: String },
-    addressCity: { type: String },
-    addressPostalCode: { type: String },
-    addressCountry: { type: String },
+    addressStreet: String,
+    addressCity: String,
+    addressPostalCode: String,
+    addressCountry: String,
 
+    // Vérification d’email
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: String,
-    emailVerificationTokenExpires: Date
+    emailVerificationTokenExpires: Date,
+
+    resetPasswordTokenHash: String,
+    resetPasswordExpires: Date,
   },
   {
-    timestamps: true, // Automatically adds createdAt / updatedAt
-  }
+    timestamps: true, // Ajoute createdAt / updatedAt
+  },
 );
 
-// Geospatial index for location-based search
-UserSchema.index({ location: "2dsphere" });
+// Index géospatial
+UserSchema.index({ location: '2dsphere' });
 
-export default model("User", UserSchema);
+export default model('User', UserSchema);

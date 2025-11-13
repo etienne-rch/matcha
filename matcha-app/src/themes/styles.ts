@@ -110,9 +110,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: rnpTheme.spacing.sm,
     backgroundColor: 'transparent',
   },
-  avatarStatic: {
-    backgroundColor: rnpTheme.colors.avatarBackground,
-  },
 });
 
 export { styles };

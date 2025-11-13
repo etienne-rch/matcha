@@ -1,7 +1,16 @@
+import { View } from 'react-native';
 import { Avatar } from 'react-native-paper';
 
-import { styles } from '@/themes/styles';
+import rnpTheme from '@/themes/rnpTheme';
 
-export default function AvatarStatic() {
-  return <Avatar.Icon icon="account" size={256} style={styles.avatarStatic} />;
+export function AvatarStatic() {
+  return (
+    <View style={{ alignItems: 'center', marginBottom: rnpTheme.spacing.lg }}>
+      <Avatar.Icon
+        icon="account"
+        size={128}
+        style={{ backgroundColor: rnpTheme.colors.avatarBackground }}
+      />
+    </View>
+  );
 }

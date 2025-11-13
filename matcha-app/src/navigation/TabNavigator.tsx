@@ -1,11 +1,30 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import LogoutScreen from '@/screens/Auth/Logout';
 import HomeScreen from '@/screens/Home/index';
 import ProfileScreen from '@/screens/Profile';
+import ChangePasswordScreen from '@/screens/Profile/ChangePasswordScreen';
 
 const Tab = createBottomTabNavigator();
+const ProfileStack = createNativeStackNavigator();
+
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="ProfileMain"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ title: 'Modifier le mot de passe' }}
+      />
+    </ProfileStack.Navigator>
+  );
+}
 
 export default function TabNavigator() {
   return (
@@ -15,16 +34,6 @@ export default function TabNavigator() {
         tabBarActiveTintColor: '#000000',
       }}
     >
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: 'Profil',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="people" color={color} size={size} />
-          ),
-        }}
-      />
       <Tab.Screen
         name="Home"
         component={HomeScreen}
@@ -37,12 +46,12 @@ export default function TabNavigator() {
       />
 
       <Tab.Screen
-        name="Logout"
-        component={LogoutScreen}
+        name="Profile"
+        component={ProfileStackNavigator}
         options={{
-          title: 'Déconnexion',
+          title: 'Profil',
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="logout" color={color} size={size} />
+            <MaterialIcons name="people" color={color} size={size} />
           ),
         }}
       />

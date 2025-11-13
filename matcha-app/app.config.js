@@ -9,6 +9,7 @@ export default {
     icon: './src/assets/icons/icon.png',
     userInterfaceStyle: 'light',
     newArchEnabled: true,
+    scheme: 'matcha',
     splash: {
       image: './src/assets/icons/splash-icon.png',
       resizeMode: 'contain',

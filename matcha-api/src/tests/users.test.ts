@@ -136,7 +136,8 @@ describe('GET /api/users/verify-email', () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.body.message).toBe('Email successfully verified');
+    expect(res.type).toBe('text/html');
+    expect(res.text).toContain('Email vérifié avec succès');
 
     const updatedUser = await User.findById(user._id);
     expect(updatedUser?.isEmailVerified).toBe(true);
@@ -147,13 +148,15 @@ describe('GET /api/users/verify-email', () => {
   it('should return 400 for missing token', async () => {
     const res = await request(app).get('/api/users/verify-email');
     expect(res.status).toBe(400);
-    expect(res.body.message).toBe('Invalid or missing token');
+    expect(res.type).toBe('text/html');
+    expect(res.text).toContain('Token invalide');
   });
 
   it('should return 404 for invalid token', async () => {
     const res = await request(app).get('/api/users/verify-email?token=invalid');
     expect(res.status).toBe(404);
-    expect(res.body.message).toBe('Invalid or expired token');
+    expect(res.type).toBe('text/html');
+    expect(res.text).toContain('Token expiré');
   });
 
   it('should return 404 for expired token', async () => {
@@ -169,6 +172,7 @@ describe('GET /api/users/verify-email', () => {
       `/api/users/verify-email?token=${token}`,
     );
     expect(res.status).toBe(404);
-    expect(res.body.message).toBe('Invalid or expired token');
+    expect(res.type).toBe('text/html');
+    expect(res.text).toContain('Token expiré');
   });
 });

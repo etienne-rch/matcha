@@ -8,11 +8,16 @@ import User from '@/models/User';
 import { sendResetPasswordEmail } from '@/services/email';
 import { RequestPasswordResetInput, ResetPasswordInput } from '@/types/user';
 
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
 export const login = async (
-  req: Request,
+  req: Request<object, object, LoginRequest>,
   res: Response,
   next: NextFunction,
-) => {
+): Promise<Response | void> => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -29,6 +34,13 @@ export const login = async (
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        message:
+          'Please verify your email address before logging in. Check your inbox for the verification link.',
+      });
     }
 
     const token = jwt.sign(
@@ -53,9 +65,9 @@ export const login = async (
 };
 
 export const requestPasswordReset = async (
-  req: Request<{}, {}, RequestPasswordResetInput>,
+  req: Request<object, object, RequestPasswordResetInput>,
   res: Response,
-): Promise<void> => {
+): Promise<Response | void> => {
   const { email } = req.body;
 
   try {
@@ -71,14 +83,11 @@ export const requestPasswordReset = async (
     // Génère un token brut (envoyé par email)
     const resetToken = crypto.randomBytes(32).toString('hex');
 
-    // Hash du token (stocké en base)
-    const tokenHash = crypto
+    // Enregistre le hash et une date d'expiration (15 min)
+    user.resetPasswordTokenHash = crypto
       .createHash('sha256')
       .update(resetToken)
       .digest('hex');
-
-    // Enregistre le hash et une date d’expiration (15 min)
-    user.resetPasswordTokenHash = tokenHash;
     user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
@@ -89,15 +98,15 @@ export const requestPasswordReset = async (
       message: 'If this email exists, a reset link has been sent.',
     });
   } catch (error) {
-    console.error('❌ Error in requestPasswordReset:', error);
+    console.error('Error in requestPasswordReset:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const resetPassword = async (
-  req: Request<{}, {}, ResetPasswordInput>,
+  req: Request<object, object, ResetPasswordInput>,
   res: Response,
-): Promise<void> => {
+): Promise<Response | void> => {
   const { token, newPassword } = req.body;
 
   try {
@@ -124,7 +133,7 @@ export const resetPassword = async (
 
     res.status(200).json({ message: 'Password successfully reset' });
   } catch (error) {
-    console.error('❌ Error in resetPassword:', error);
+    console.error('Error in resetPassword:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

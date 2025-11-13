@@ -26,10 +26,10 @@ export default function TabNavigator() {
       />
 
       <Tab.Screen
-        name="Déconnexion"
+        name="Deconnexion"
         component={LogoutScreen}
         options={{
-          title: 'Déconnexion',
+          title: 'Deconnexion',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="logout" color={color} size={size} />
           ),

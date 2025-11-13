@@ -61,13 +61,15 @@ export default function LoginForm() {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-    } catch (_error) {
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || 'Veuillez réessayer';
       Toast.show({
         type: 'error',
         text1: 'Échec de la connexion',
-        text2: 'Veuillez réessayer',
+        text2: errorMessage,
         position: 'top',
-        visibilityTime: 5000,
+        visibilityTime: 8000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });

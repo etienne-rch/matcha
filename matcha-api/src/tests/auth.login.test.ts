@@ -13,6 +13,7 @@ beforeEach(async () => {
     firstName: 'John',
     lastName: 'Doe',
     consentAccepted: true,
+    isEmailVerified: true,
   });
 });
 
@@ -34,6 +35,25 @@ describe('POST /api/auth/login', () => {
       .send({ email: 'test@example.com', password: 'WrongPassword123!' });
 
     expect(res.status).toBe(401);
+  });
+
+  it('should return 403 for unverified email', async () => {
+    const passwordHash = await bcrypt.hash('Password123!', 10);
+    await User.create({
+      email: 'unverified@example.com',
+      passwordHash,
+      firstName: 'Unverified',
+      lastName: 'User',
+      consentAccepted: true,
+      isEmailVerified: false,
+    });
+
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'unverified@example.com', password: 'Password123!' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toContain('verify your email');
   });
 
   it('should return 400 for invalid input data', async () => {

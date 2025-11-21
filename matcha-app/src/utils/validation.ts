@@ -1,8 +1,15 @@
-export function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+import { ZodSchema } from 'zod';
 
-export function validatePassword(password: string): boolean {
-  // Au moins 8 caractères, une majuscule, une minuscule, un chiffre
-  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+export function validateZod<T>(schema: ZodSchema<T>, data: any) {
+  const result = schema.safeParse(data);
+  if (result.success) return { valid: true, errors: {} };
+
+  const errors: Record<string, string> = {};
+
+  result.error.errors.forEach((err) => {
+    const field = err.path[0] as string;
+    errors[field] = err.message;
+  });
+
+  return { valid: false, errors };
 }

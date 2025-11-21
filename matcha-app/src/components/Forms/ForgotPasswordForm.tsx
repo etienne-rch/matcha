@@ -4,24 +4,23 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { requestPasswordReset } from '@/api/auth';
-import { ForgotPasswordFormProps } from '@/components/Forms/types';
+import { forgotPasswordSchema } from '@/schemas/forgot-password';
 import { styles } from '@/themes/styles';
-import { validateEmail } from '@/utils/validation';
+import { validateZod } from '@/utils/validation';
+
+import { ForgotPasswordFormProps } from './types';
 
 export default function ForgotPasswordForm({
   setSent,
 }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
-    if (!email.trim()) {
-      setError("L'email est requis");
-      return;
-    }
-    if (!validateEmail(email)) {
-      setError("Format d'email invalide");
+    const { valid, errors } = validateZod(forgotPasswordSchema, { email });
+    if (!valid) {
+      setError(errors.email);
       return;
     }
 
@@ -68,16 +67,17 @@ export default function ForgotPasswordForm({
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
-        error={!!error}
         disabled={loading}
+        error={!!error}
       />
       {error && <HelperText type="error">{error}</HelperText>}
+
       <Button
         mode="contained"
         onPress={handleSubmit}
-        style={styles.continueButton}
         loading={loading}
         disabled={loading}
+        style={styles.continueButton}
       >
         Envoyer le lien
       </Button>

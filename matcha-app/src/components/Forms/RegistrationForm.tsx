@@ -6,21 +6,24 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
+import { registrationSchema } from '@/schemas/registration';
 import { styles } from '@/themes/styles';
 import { AuthStackParamList } from '@/types/navigation';
-import { validateEmail, validatePassword } from '@/utils/validation';
+import { validateZod } from '@/utils/validation';
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 export default function RegistrationForm() {
   const navigation = useNavigation<NavigationProp>();
-  const [lastName, setLastname] = useState('');
+  const { register } = useAuth();
+
   const [firstName, setFirstname] = useState('');
+  const [lastName, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
-  const { register } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState({
     firstName: '',
@@ -29,58 +32,27 @@ export default function RegistrationForm() {
     password: '',
   });
 
-  const resetForm = () => {
-    setFirstname('');
-    setLastname('');
-    setEmail('');
-    setPassword('');
-    setErrors({ firstName: '', lastName: '', email: '', password: '' });
-  };
-
-  const validateForm = () => {
-    let valid = true;
-    let newErrors = { firstName: '', lastName: '', email: '', password: '' };
-
-    if (!lastName.trim()) {
-      newErrors.lastName = 'Le nom est requis';
-      valid = false;
-    }
-
-    if (!firstName.trim()) {
-      newErrors.firstName = 'Le prénom est requis';
-      valid = false;
-    }
-
-    if (!email.trim()) {
-      newErrors.email = 'L’email est requis';
-      valid = false;
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Format d’email invalide';
-      valid = false;
-    }
-
-    if (!password.trim()) {
-      newErrors.password = 'Le mot de passe est requis';
-      valid = false;
-    } else if (!validatePassword(password)) {
-      newErrors.password =
-        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
   const handleRegister = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    const { valid, errors: zodErrors } = validateZod(registrationSchema, {
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
+    setErrors({
+      firstName: zodErrors.firstName || '',
+      lastName: zodErrors.lastName || '',
+      email: zodErrors.email || '',
+      password: zodErrors.password || '',
+    });
+
+    if (!valid) return;
 
     setLoading(true);
     try {
       await register({ email, password, firstName, lastName });
-      resetForm();
+
       Toast.show({
         type: 'success',
         text1: 'Inscription réussie',
@@ -90,10 +62,14 @@ export default function RegistrationForm() {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
+
+      setFirstname('');
+      setLastname('');
+      setEmail('');
+      setPassword('');
+
       // Redirection vers l'écran de connexion après un court délai
-      setTimeout(() => {
-        navigation.navigate('Login');
-      }, 1000);
+      setTimeout(() => navigation.navigate('Login'), 1000);
     } catch {
       Toast.show({
         type: 'error',
@@ -117,8 +93,8 @@ export default function RegistrationForm() {
         onChangeText={setFirstname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.firstName}
         disabled={loading}
+        error={!!errors.firstName}
       />
       {errors.firstName && (
         <HelperText type="error">{errors.firstName}</HelperText>
@@ -130,8 +106,8 @@ export default function RegistrationForm() {
         onChangeText={setLastname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.lastName}
         disabled={loading}
+        error={!!errors.lastName}
       />
       {errors.lastName && (
         <HelperText type="error">{errors.lastName}</HelperText>
@@ -145,8 +121,8 @@ export default function RegistrationForm() {
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
-        error={!!errors.email}
         disabled={loading}
+        error={!!errors.email}
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
@@ -157,8 +133,8 @@ export default function RegistrationForm() {
         mode="outlined"
         secureTextEntry={!showPassword}
         style={styles.input}
-        error={!!errors.password}
         disabled={loading}
+        error={!!errors.password}
         right={
           <TextInput.Icon
             icon={showPassword ? 'eye-off' : 'eye'}
@@ -173,9 +149,9 @@ export default function RegistrationForm() {
       <Button
         mode="contained"
         onPress={handleRegister}
-        style={styles.continueButton}
         loading={loading}
         disabled={loading}
+        style={styles.continueButton}
       >
         Continuer
       </Button>

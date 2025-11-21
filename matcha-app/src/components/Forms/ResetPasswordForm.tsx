@@ -4,32 +4,35 @@ import { Button, HelperText, Text, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { changePassword } from '@/api/profile';
+import { newPasswordSchema } from '@/schemas/password-reset';
 import { styles } from '@/themes/styles';
-import { validatePassword } from '@/utils/validation';
+import { validateZod } from '@/utils/validation';
 
 export default function ResetPasswordForm() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState('');
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async () => {
-    if (!currentPassword || !password || !confirm) {
-      setError('Tous les champs sont requis');
+    if (!currentPassword.trim()) {
+      setError('Le mot de passe actuel est requis');
       return;
     }
-    if (!validatePassword(password)) {
-      setError(
-        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
-      );
-      return;
-    }
-    if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas');
+
+    const { valid, errors } = validateZod(newPasswordSchema, {
+      password,
+      confirm,
+    });
+
+    if (!valid) {
+      setError(errors.password || errors.confirm);
       return;
     }
 

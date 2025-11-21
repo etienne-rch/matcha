@@ -4,9 +4,11 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { resetPassword } from '@/api/auth';
-import { NewPasswordFormProps } from '@/components/Forms/types';
+import { newPasswordSchema } from '@/schemas/password-reset';
 import { styles } from '@/themes/styles';
-import { validatePassword } from '@/utils/validation';
+import { validateZod } from '@/utils/validation';
+
+import { NewPasswordFormProps } from './types';
 
 export default function NewPasswordForm({
   token,
@@ -14,24 +16,21 @@ export default function NewPasswordForm({
 }: NewPasswordFormProps) {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async () => {
-    if (!password || !confirm) {
-      setError('Tous les champs sont requis');
-      return;
-    }
-    if (!validatePassword(password)) {
-      setError(
-        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
-      );
-      return;
-    }
-    if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas');
+    const { valid, errors } = validateZod(newPasswordSchema, {
+      password,
+      confirm,
+    });
+
+    if (!valid) {
+      setError(errors.password || errors.confirm);
       return;
     }
 
@@ -108,9 +107,9 @@ export default function NewPasswordForm({
       <Button
         mode="contained"
         onPress={handleSubmit}
-        style={styles.continueButton}
         loading={loading}
         disabled={loading}
+        style={styles.continueButton}
       >
         Réinitialiser le mot de passe
       </Button>

@@ -4,50 +4,32 @@ import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
+import { loginSchema } from '@/schemas/login';
 import { styles } from '@/themes/styles';
-import { validateEmail, validatePassword } from '@/utils/validation';
+import { validateZod } from '@/utils/validation';
 
 export default function LoginForm() {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setMotDePasse] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
 
-  const [errors, setErrors] = useState({
-    email: '',
-    password: '',
-  });
-
-  const validateForm = () => {
-    let valid = true;
-    let newErrors = { email: '', password: '' };
-
-    if (!email.trim()) {
-      newErrors.email = 'L’email est requis';
-      valid = false;
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Format d’email invalide';
-      valid = false;
-    }
-
-    if (!password.trim()) {
-      newErrors.password = 'Le mot de passe est requis';
-      valid = false;
-    } else if (!validatePassword(password)) {
-      newErrors.password =
-        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
+  const [errors, setErrors] = useState({ email: '', password: '' });
 
   const handleLogin = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    const { valid, errors: zodErrors } = validateZod(loginSchema, {
+      email,
+      password,
+    });
+
+    setErrors({
+      email: zodErrors.email || '',
+      password: zodErrors.password || '',
+    });
+
+    if (!valid) return;
 
     setLoading(true);
     try {
@@ -88,8 +70,8 @@ export default function LoginForm() {
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
-        error={!!errors.email}
         disabled={loading}
+        error={!!errors.email}
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
@@ -100,8 +82,8 @@ export default function LoginForm() {
         mode="outlined"
         secureTextEntry={!showPassword}
         style={styles.input}
-        error={!!errors.password}
         disabled={loading}
+        error={!!errors.password}
         right={
           <TextInput.Icon
             icon={showPassword ? 'eye-off' : 'eye'}
@@ -116,9 +98,9 @@ export default function LoginForm() {
       <Button
         mode="contained"
         onPress={handleLogin}
-        style={styles.continueButton}
         loading={loading}
         disabled={loading}
+        style={styles.continueButton}
       >
         Continuer
       </Button>

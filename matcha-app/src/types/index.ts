@@ -4,4 +4,6 @@ export interface User {
   firstName: string;
   lastName: string;
   subscription: string;
+  personalityTestId?: string;
+  isEmailVerified?: boolean;
 }

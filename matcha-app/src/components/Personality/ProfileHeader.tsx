@@ -30,7 +30,6 @@ export default function ProfileHeader({
 
 const styles = StyleSheet.create({
   logoContainer: {
-    backgroundColor: Colors.background,
     paddingVertical: 20,
     paddingTop: 60,
     alignItems: 'center',
@@ -52,6 +51,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 20,
     alignItems: 'center',
+    marginBottom: 20,
   },
   profileTitle: {
     fontSize: 28,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   profileLabel: {
     fontSize: 32,
     fontWeight: '700',
-    color: Colors.greenDark.normal,
+    color: Colors.orange.normal,
     textAlign: 'center',
   },
 });

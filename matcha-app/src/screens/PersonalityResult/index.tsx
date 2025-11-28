@@ -1,5 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { PersonalityResult } from '@/api/personality';
 import {
@@ -63,55 +70,63 @@ export default function PersonalityResultScreen({
   ];
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false },
-        )}
-        scrollEventThrottle={16}
-      >
-        <ProfileHeader label={result.label} showLogo={true} />
+    <ImageBackground
+      source={require('@/assets/backgrounds/default.jpg')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false },
+          )}
+          scrollEventThrottle={16}
+        >
+          <ProfileHeader label={result.label} showLogo={true} />
 
-        <View style={styles.chartContainer}>
-          <RadarChart data={radarData} />
-        </View>
-
-        <ProfileSection title="Description">
-          <Text style={styles.description}>{result.description}</Text>
-        </ProfileSection>
-
-        <ProfileSection title="Forces">
-          <TagList items={result.strengths} variant="success" />
-        </ProfileSection>
-
-        <ProfileSection title="Points d'attention">
-          <TagList items={result.weaknesses} variant="warning" />
-        </ProfileSection>
-
-        <ProfileSection title="Métiers recommandés" isLast={true}>
-          <View style={styles.jobsList}>
-            {result.recommendedJobs.map((job, index) => (
-              <View key={index} style={styles.jobItem}>
-                <View style={styles.jobBullet} />
-                <Text style={styles.jobText}>{job}</Text>
-              </View>
-            ))}
+          <View style={styles.chartContainer}>
+            <RadarChart data={radarData} />
           </View>
-        </ProfileSection>
-      </ScrollView>
 
-      <FloatingActionButton onPress={onContinue} scrollY={scrollY} />
-    </View>
+          <ProfileSection title="Description">
+            <Text style={styles.description}>{result.description}</Text>
+          </ProfileSection>
+
+          <ProfileSection title="Forces">
+            <TagList items={result.strengths} variant="success" />
+          </ProfileSection>
+
+          <ProfileSection title="Points d'attention">
+            <TagList items={result.weaknesses} variant="warning" />
+          </ProfileSection>
+
+          <ProfileSection title="Métiers recommandés" isLast={true}>
+            <View style={styles.jobsList}>
+              {result.recommendedJobs.map((job, index) => (
+                <View key={index} style={styles.jobItem}>
+                  <View style={styles.jobBullet} />
+                  <Text style={styles.jobText}>{job}</Text>
+                </View>
+              ))}
+            </View>
+          </ProfileSection>
+        </ScrollView>
+
+        <FloatingActionButton onPress={onContinue} scrollY={scrollY} />
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: Colors.greyLight.normal,
   },
   scrollView: {
     flex: 1,

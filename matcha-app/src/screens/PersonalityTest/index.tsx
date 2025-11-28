@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -188,65 +189,73 @@ export default function PersonalityTestScreen() {
   const isComplete = answers.size === test.questions.length;
 
   return (
-    <View style={styles.container}>
-      <TestHeader
-        title={test.title}
-        summary={test.summary}
-        currentQuestion={answers.size}
-        totalQuestions={test.questions.length}
-      />
+    <ImageBackground
+      source={require('@/assets/backgrounds/default.jpg')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <TestHeader
+          title={test.title}
+          summary={test.summary}
+          currentQuestion={answers.size}
+          totalQuestions={test.questions.length}
+        />
 
-      <ScrollView
-        ref={scrollViewRef}
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {test.questions.map((question, index) => (
-          <View
-            key={question.id}
-            ref={(ref) => {
-              if (ref) {
-                questionRefs.current.set(question.id, ref);
-              }
-            }}
-          >
-            <QuestionCard
-              questionNumber={index + 1}
-              questionText={question.text}
-              options={question.options}
-              selectedValue={answers.get(question.id)}
-              onAnswer={(value) => handleAnswer(question.id, value)}
-            />
-          </View>
-        ))}
-
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            (!isComplete || submitting) && styles.submitButtonDisabled,
-          ]}
-          onPress={handleSubmit}
-          disabled={!isComplete || submitting}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
         >
-          {submitting ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>
-              {isComplete
-                ? 'Terminer le test'
-                : 'Complétez toutes les questions'}
-            </Text>
-          )}
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+          {test.questions.map((question, index) => (
+            <View
+              key={question.id}
+              ref={(ref) => {
+                if (ref) {
+                  questionRefs.current.set(question.id, ref);
+                }
+              }}
+            >
+              <QuestionCard
+                questionNumber={index + 1}
+                questionText={question.text}
+                options={question.options}
+                selectedValue={answers.get(question.id)}
+                onAnswer={(value) => handleAnswer(question.id, value)}
+              />
+            </View>
+          ))}
+
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (!isComplete || submitting) && styles.submitButtonDisabled,
+            ]}
+            onPress={handleSubmit}
+            disabled={!isComplete || submitting}
+          >
+            {submitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                {isComplete
+                  ? 'Terminer le test'
+                  : 'Complétez toutes les questions'}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: Colors.greyLight.normal,
   },
   centerContainer: {
     flex: 1,

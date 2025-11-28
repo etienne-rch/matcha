@@ -16,6 +16,7 @@ import {
   submitPersonalityTest,
 } from '@/api/personality';
 import { useAuth } from '@/hooks/useAuth';
+import Colors from '@/themes/colors';
 
 export default function PersonalityTestScreen() {
   const { refreshUser, logout } = useAuth();
@@ -204,29 +205,30 @@ export default function PersonalityTestScreen() {
             <Text style={styles.questionNumber}>Question {index + 1}</Text>
             <Text style={styles.questionText}>{question.text}</Text>
 
-            <View style={styles.optionsContainer}>
-              {question.options.map((option: any) => {
-                const isSelected = answers.get(question.id) === option.value;
-                return (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.optionButton,
-                      isSelected && styles.optionButtonSelected,
-                    ]}
-                    onPress={() => handleAnswer(question.id, option.value)}
-                  >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        isSelected && styles.optionTextSelected,
-                      ]}
+            <View style={styles.optionsWrapper}>
+              <View style={styles.optionsContainer}>
+                {question.options.map((option: any) => {
+                  const isSelected = answers.get(question.id) === option.value;
+                  return (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={styles.optionButton}
+                      onPress={() => handleAnswer(question.id, option.value)}
                     >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+                      <View
+                        style={[
+                          styles.optionCircle,
+                          isSelected && styles.optionCircleSelected,
+                        ]}
+                      />
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <View style={styles.labelsContainer}>
+                <Text style={styles.labelText}>Pas du tout d'accord</Text>
+                <Text style={styles.labelText}>Tout à fait d'accord</Text>
+              </View>
             </View>
           </View>
         ))}
@@ -258,30 +260,30 @@ export default function PersonalityTestScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: Colors.greyLight.normal,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9fafb',
+    backgroundColor: Colors.greyLight.normal,
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     padding: 20,
     paddingTop: 60,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: Colors.greyLight.divider,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#111827',
+    color: Colors.primary,
     marginBottom: 8,
   },
   summary: {
     fontSize: 14,
-    color: '#6b7280',
+    color: Colors.greyDark.normal,
     marginBottom: 16,
   },
   progressContainer: {
@@ -292,19 +294,19 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: Colors.greyLight.active,
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#6366f1',
+    backgroundColor: Colors.greenLight.normal,
     borderRadius: 4,
   },
   progressText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6366f1',
+    color: Colors.greenLight.dark.normal,
     minWidth: 50,
   },
   scrollView: {
@@ -315,110 +317,125 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   questionContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
   },
   questionNumber: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6366f1',
+    color: Colors.orange.normal,
     textTransform: 'uppercase',
     marginBottom: 8,
+    letterSpacing: 0.5,
   },
   questionText: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#111827',
-    marginBottom: 20,
-    lineHeight: 26,
+    color: Colors.primary,
+    marginBottom: 24,
+    lineHeight: 24,
   },
-  optionsContainer: {
+  optionsWrapper: {
     gap: 12,
   },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
   optionButton: {
-    backgroundColor: '#f9fafb',
+    padding: 8,
+  },
+  optionCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.greyLight.normal,
     borderWidth: 2,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 16,
+    borderColor: Colors.greyLight.dark.normal,
   },
-  optionButtonSelected: {
-    backgroundColor: '#eef2ff',
-    borderColor: '#6366f1',
+  optionCircleSelected: {
+    backgroundColor: Colors.greenLight.normal,
+    borderColor: Colors.greenLight.dark.normal,
+    transform: [{ scale: 1.1 }],
   },
-  optionText: {
-    fontSize: 16,
-    color: '#374151',
-    textAlign: 'center',
+  labelsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+    marginTop: 8,
   },
-  optionTextSelected: {
-    color: '#6366f1',
-    fontWeight: '600',
+  labelText: {
+    fontSize: 12,
+    color: Colors.greyDark.normal,
+    fontStyle: 'italic',
+    maxWidth: '45%',
   },
   submitButton: {
-    backgroundColor: '#6366f1',
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
     padding: 16,
     alignItems: 'center',
     marginTop: 20,
   },
   submitButtonDisabled: {
-    backgroundColor: '#9ca3af',
+    backgroundColor: Colors.greyLight.dark.normal,
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#fff',
+    color: Colors.background,
     fontSize: 16,
     fontWeight: '600',
   },
   errorText: {
     fontSize: 16,
-    color: '#dc2626',
+    color: Colors.error,
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#dc2626',
+    color: Colors.error,
     marginBottom: 12,
     textAlign: 'center',
   },
   errorMessage: {
     fontSize: 14,
-    color: '#6b7280',
+    color: Colors.greyDark.normal,
     textAlign: 'center',
     paddingHorizontal: 32,
     marginBottom: 24,
     lineHeight: 20,
   },
   retryButton: {
-    backgroundColor: '#6366f1',
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 32,
     marginBottom: 12,
   },
   retryButtonText: {
-    color: '#fff',
+    color: Colors.background,
     fontSize: 16,
     fontWeight: '600',
   },
   logoutButton: {
-    backgroundColor: '#f3f4f6',
-    borderRadius: 8,
+    backgroundColor: Colors.greyLight.normal,
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: Colors.greyLight.dark.normal,
   },
   logoutButtonText: {
-    color: '#374151',
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },

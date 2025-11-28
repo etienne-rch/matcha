@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import LogoutScreen from '@/screens/Auth/Logout';
 import HomeScreen from '@/screens/Home/index';
+import ProfileScreen from '@/screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +22,17 @@ export default function TabNavigator() {
           title: 'Accueil',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Profil"
+        component={ProfileScreen}
+        options={{
+          title: 'Profil',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="person" color={color} size={size} />
           ),
         }}
       />

@@ -15,7 +15,9 @@ import {
   getActivePersonalityTest,
   submitPersonalityTest,
 } from '@/api/personality';
+import { QuestionCard, TestHeader } from '@/components/Personality';
 import { useAuth } from '@/hooks/useAuth';
+import PersonalityResultScreen from '@/screens/PersonalityResult';
 import Colors from '@/themes/colors';
 
 export default function PersonalityTestScreen() {
@@ -24,6 +26,8 @@ export default function PersonalityTestScreen() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [answers, setAnswers] = useState<Map<string, number>>(new Map());
+  const [result, setResult] = useState<any>(null);
+  const [showResult, setShowResult] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const questionRefs = useRef<Map<string, View>>(new Map());
 
@@ -108,15 +112,16 @@ export default function PersonalityTestScreen() {
         value,
       }));
 
-      await submitPersonalityTest(formattedAnswers);
+      const testResult = await submitPersonalityTest(formattedAnswers);
+
+      setResult(testResult);
+      setShowResult(true);
 
       Toast.show({
         type: 'success',
         text1: 'Test terminé !',
         text2: 'Votre profil de personnalité a été enregistré',
       });
-
-      await refreshUser();
     } catch (error: any) {
       Toast.show({
         type: 'error',
@@ -128,6 +133,19 @@ export default function PersonalityTestScreen() {
       setSubmitting(false);
     }
   };
+
+  const handleContinueFromResult = async () => {
+    await refreshUser();
+  };
+
+  if (showResult && result) {
+    return (
+      <PersonalityResultScreen
+        result={result}
+        onContinue={handleContinueFromResult}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -168,25 +186,16 @@ export default function PersonalityTestScreen() {
   }
 
   const isComplete = answers.size === test.questions.length;
-  const progress = (answers.size / test.questions.length) * 100;
 
   return (
     <View style={styles.container}>
-      {/* Header fixe avec progression */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{test.title}</Text>
-        {test.summary && <Text style={styles.summary}>{test.summary}</Text>}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${progress}%` }]} />
-          </View>
-          <Text style={styles.progressText}>
-            {answers.size} / {test.questions.length}
-          </Text>
-        </View>
-      </View>
+      <TestHeader
+        title={test.title}
+        summary={test.summary}
+        currentQuestion={answers.size}
+        totalQuestions={test.questions.length}
+      />
 
-      {/* Questions */}
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}
@@ -200,40 +209,17 @@ export default function PersonalityTestScreen() {
                 questionRefs.current.set(question.id, ref);
               }
             }}
-            style={styles.questionContainer}
           >
-            <Text style={styles.questionNumber}>Question {index + 1}</Text>
-            <Text style={styles.questionText}>{question.text}</Text>
-
-            <View style={styles.optionsWrapper}>
-              <View style={styles.optionsContainer}>
-                {question.options.map((option: any) => {
-                  const isSelected = answers.get(question.id) === option.value;
-                  return (
-                    <TouchableOpacity
-                      key={option.value}
-                      style={styles.optionButton}
-                      onPress={() => handleAnswer(question.id, option.value)}
-                    >
-                      <View
-                        style={[
-                          styles.optionCircle,
-                          isSelected && styles.optionCircleSelected,
-                        ]}
-                      />
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              <View style={styles.labelsContainer}>
-                <Text style={styles.labelText}>Pas du tout d'accord</Text>
-                <Text style={styles.labelText}>Tout à fait d'accord</Text>
-              </View>
-            </View>
+            <QuestionCard
+              questionNumber={index + 1}
+              questionText={question.text}
+              options={question.options}
+              selectedValue={answers.get(question.id)}
+              onAnswer={(value) => handleAnswer(question.id, value)}
+            />
           </View>
         ))}
 
-        {/* Bouton de soumission */}
         <TouchableOpacity
           style={[
             styles.submitButton,
@@ -268,116 +254,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.greyLight.normal,
   },
-  header: {
-    backgroundColor: Colors.background,
-    padding: 20,
-    paddingTop: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.greyLight.divider,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.primary,
-    marginBottom: 8,
-  },
-  summary: {
-    fontSize: 14,
-    color: Colors.greyDark.normal,
-    marginBottom: 16,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: Colors.greyLight.active,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.greenLight.normal,
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.greenLight.dark.normal,
-    minWidth: 50,
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
-  },
-  questionContainer: {
-    backgroundColor: Colors.background,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  questionNumber: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.orange.normal,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-    letterSpacing: 0.5,
-  },
-  questionText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: Colors.primary,
-    marginBottom: 24,
-    lineHeight: 24,
-  },
-  optionsWrapper: {
-    gap: 12,
-  },
-  optionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-  },
-  optionButton: {
-    padding: 8,
-  },
-  optionCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.greyLight.normal,
-    borderWidth: 2,
-    borderColor: Colors.greyLight.dark.normal,
-  },
-  optionCircleSelected: {
-    backgroundColor: Colors.greenLight.normal,
-    borderColor: Colors.greenLight.dark.normal,
-    transform: [{ scale: 1.1 }],
-  },
-  labelsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 4,
-    marginTop: 8,
-  },
-  labelText: {
-    fontSize: 12,
-    color: Colors.greyDark.normal,
-    fontStyle: 'italic',
-    maxWidth: '45%',
   },
   submitButton: {
     backgroundColor: Colors.primary,

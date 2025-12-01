@@ -1,5 +1,6 @@
 import PersonalityTemplate from '@/models/PersonalityTemplate';
 import PersonalityTest from '@/models/PersonalityTest';
+import User from '@/models/User';
 
 interface Answer {
   questionId: string;
@@ -48,6 +49,9 @@ export async function computePersonality(userId: string, answers: Answer[]) {
     traits: profile ? [profile.label, ...(profile.strengths ?? [])] : [],
     motivationProfile: profile?.recommendedJobs ?? [],
   });
+
+  // Mise à jour de l'utilisateur avec le personalityTestId
+  await User.findByIdAndUpdate(userId, { personalityTestId: test._id });
 
   // Retourne un résumé structuré
   return {

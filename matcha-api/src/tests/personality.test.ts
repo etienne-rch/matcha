@@ -38,8 +38,10 @@ describe('Personality API', () => {
         .set(authHeader());
 
       expect(res.status).toBe(200);
-      expect(res.body.title).toBe('MBTI Test');
-      expect(Array.isArray(res.body.questions)).toBe(true);
+      expect(res.body.completed).toBe(false);
+      expect(res.body.test).toBeDefined();
+      expect(res.body.test.title).toBe('MBTI Test');
+      expect(Array.isArray(res.body.test.questions)).toBe(true);
     });
 
     it('should return 404 if no active test found', async () => {

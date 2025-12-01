@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 
 import { useAuth } from '@/hooks/useAuth';
 import AuthStack from '@/navigation/AuthStack';
-import TabNavigator from '@/navigation/TabNavigator';
+import MainStack from '@/navigation/MainStack';
 
 const linking = {
   prefixes: [Linking.createURL('/'), 'matcha://', 'exp://'],
@@ -20,6 +20,7 @@ const linking = {
       },
       Home: 'home',
       Deconnexion: 'logout',
+      PersonalityTest: 'personality-test',
     },
   },
 };
@@ -29,7 +30,7 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer linking={linking}>
-      {user ? <TabNavigator /> : <AuthStack />}
+      {user ? <MainStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }

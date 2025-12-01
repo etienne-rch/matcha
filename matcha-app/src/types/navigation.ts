@@ -7,4 +7,5 @@ export type AuthStackParamList = {
 
 export type CommonStackParamList = {
   Home: undefined;
+  PersonalityTest: undefined;
 };

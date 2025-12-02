@@ -1,7 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 
+import swaggerSpec from '@/config/swagger';
 import { errorHandler } from '@/middlewares/error.middleware';
 import authRoutes from '@/routes/auth.routes';
 import healthRoutes from '@/routes/health.routes';
@@ -15,6 +17,9 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
 app.use(helmet());
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/auth', authRoutes);
 app.use('/health', healthRoutes);

@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
-import { updateProfile } from '@/api/profile';
+import {
+  changePassword,
+  requestEmailChange,
+  updateProfile,
+} from '@/api/profile';
 import BottomSheetSelect from '@/components/UI/BottomSheetSelect';
-import DatePickerInput from '@/components/UI/DatePickerInput';
+import { AuthContext } from '@/contexts/AuthContext';
+import { changePasswordSchema } from '@/schemas/change-password';
 import rnpTheme from '@/themes/rnpTheme';
 import { UserFull } from '@/types/user';
+import { validateZod } from '@/utils/validation';
+
+import YearPickerInput from '../UI/YearPickerInput';
 
 export default function ProfileSections({
   section,
@@ -20,6 +28,8 @@ export default function ProfileSections({
   onCancel: () => void;
   onSaved: () => void;
 }) {
+  const auth = useContext(AuthContext);
+  const logout = auth?.logout;
   const [loading, setLoading] = useState(false);
 
   const [firstName, setFirstName] = useState(user.firstName ?? '');
@@ -55,6 +65,93 @@ export default function ProfileSections({
     setLoading(true);
 
     try {
+      if (section === 'email') {
+        const trimmed = newEmail.trim();
+
+        if (!trimmed) {
+          Toast.show({
+            type: 'error',
+            text1: 'Erreur',
+            text2: 'Veuillez saisir une adresse e-mail.',
+          });
+          return;
+        }
+
+        if (!trimmed.includes('@')) {
+          Toast.show({
+            type: 'error',
+            text1: 'Erreur',
+            text2: 'Adresse e-mail invalide.',
+          });
+          return;
+        }
+
+        if (trimmed === user.email) {
+          Toast.show({
+            type: 'info',
+            text1: 'Aucun changement',
+            text2: 'Cette adresse est déjà celle de ton compte.',
+          });
+          return;
+        }
+
+        await requestEmailChange(trimmed);
+
+        Toast.show({
+          type: 'success',
+          text1: 'Vérification envoyée',
+          text2:
+            'Un e-mail de confirmation a été envoyé à ta nouvelle adresse. ' +
+            'Clique sur le lien pour finaliser le changement.',
+          position: 'top',
+        });
+
+        setTimeout(async () => {
+          await logout?.();
+        }, 1500);
+
+        onSaved();
+        return;
+      }
+
+      if (section === 'password') {
+        const { valid, errors } = validateZod(changePasswordSchema, {
+          oldPassword: currentPassword,
+          newPassword,
+          confirmNewPassword: confirmPassword,
+        });
+        if (!valid) {
+          Toast.show({
+            type: 'error',
+            text1: 'Erreur',
+            text2:
+              errors.oldPassword ||
+              errors.newPassword ||
+              errors.confirmNewPassword,
+          });
+          return;
+        }
+
+        await changePassword({
+          oldPassword: currentPassword,
+          newPassword,
+          confirmNewPassword: confirmPassword,
+        });
+
+        Toast.show({
+          type: 'success',
+          text1: 'Mot de passe mis à jour',
+          position: 'top',
+        });
+
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+
+        onSaved();
+        return;
+      }
+
       let payload: any = {};
 
       if (section === 'personal') {
@@ -88,29 +185,6 @@ export default function ProfileSections({
         };
       }
 
-      if (section === 'email') {
-        payload = {
-          email: newEmail,
-        };
-      }
-
-      if (section === 'password') {
-        if (newPassword !== confirmPassword) {
-          Toast.show({
-            type: 'error',
-            text1: 'Erreur',
-            text2: 'Les mots de passe ne correspondent pas',
-          });
-          setLoading(false);
-          return;
-        }
-
-        payload = {
-          currentPassword,
-          newPassword,
-        };
-      }
-
       await updateProfile(payload);
 
       Toast.show({
@@ -126,7 +200,7 @@ export default function ProfileSections({
       Toast.show({
         type: 'error',
         text1: 'Erreur',
-        text2: 'Impossible de modifier',
+        text2: 'Impossible de modifier tes informations.',
       });
     } finally {
       setLoading(false);
@@ -153,8 +227,8 @@ export default function ProfileSections({
             style={styles.input}
           />
 
-          <DatePickerInput
-            label="Date de naissance"
+          <YearPickerInput
+            label="Année de naissance"
             value={birthDate}
             onChange={setBirthDate}
           />
@@ -184,6 +258,11 @@ export default function ProfileSections({
             onChangeText={setNewEmail}
             style={styles.input}
           />
+
+          <Text style={styles.infoText}>
+            Après modification, tu devras confirmer cette adresse via un lien
+            reçu par e-mail.
+          </Text>
         </>
       )}
 

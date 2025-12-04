@@ -1,20 +1,16 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native-paper';
-
-import rnpTheme from '@/themes/rnpTheme';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function EditableSection({
   title,
-  children,
   isEditing,
   onEdit,
+  children,
 }: {
   title: string;
-  children: React.ReactNode;
   isEditing: boolean;
   onEdit: () => void;
+  children: React.ReactNode;
 }) {
   return (
     <View style={styles.card}>
@@ -23,39 +19,48 @@ export default function EditableSection({
 
         {!isEditing && (
           <TouchableOpacity onPress={onEdit}>
-            <MaterialIcons
-              name="edit"
-              size={22}
-              color={rnpTheme.colors.greenDark.normal}
-            />
+            <Text style={styles.editButton}>Modifier</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {children}
+      <View style={styles.content}>{children}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
-    padding: rnpTheme.spacing.lg,
-    borderRadius: 16,
-    marginBottom: rnpTheme.spacing.md,
+    backgroundColor: 'white',
+    borderRadius: 18,
+    padding: 20,
     shadowColor: '#000',
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.05,
     shadowRadius: 6,
-    elevation: 2,
+    marginBottom: 22,
   },
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: rnpTheme.spacing.md,
+    marginBottom: 14,
   },
+
   title: {
     fontSize: 18,
     fontWeight: '700',
+    color: '#062314',
+  },
+
+  editButton: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0A2916',
+  },
+
+  content: {
+    marginTop: 4,
+    gap: 12,
   },
 });

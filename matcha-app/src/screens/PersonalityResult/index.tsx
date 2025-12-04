@@ -1,3 +1,5 @@
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useRef } from 'react';
 import {
   Animated,
@@ -8,7 +10,6 @@ import {
   View,
 } from 'react-native';
 
-import { PersonalityResult } from '@/api/personality';
 import {
   FloatingActionButton,
   ProfileHeader,
@@ -16,17 +17,23 @@ import {
   RadarChart,
   TagList,
 } from '@/components/Personality';
+import { useAuth } from '@/hooks/useAuth';
 import Colors from '@/themes/colors';
+import { HomeStackParamList } from '@/types/navigation';
 
-interface PersonalityResultScreenProps {
-  result: PersonalityResult;
-  onContinue: () => void;
-}
+type ResultRoute = RouteProp<HomeStackParamList, 'PersonalityResult'>;
+type ResultNav = NativeStackNavigationProp<
+  HomeStackParamList,
+  'PersonalityResult'
+>;
 
-export default function PersonalityResultScreen({
-  result,
-  onContinue,
-}: PersonalityResultScreenProps) {
+export default function PersonalityResultScreen() {
+  const route = useRoute<ResultRoute>();
+  const navigation = useNavigation<ResultNav>();
+  const { refreshUser } = useAuth();
+
+  const { result } = route.params;
+
   const scrollY = useRef(new Animated.Value(0)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
 
@@ -38,36 +45,24 @@ export default function PersonalityResultScreen({
     }).start();
   }, []);
 
-  const normalizeScore = (score: number) => {
-    return (score + 12) / 24;
-  };
+  const normalizeScore = (score: number) => (score + 12) / 24;
 
   const radarData = [
-    {
-      label: 'Créativité',
-      value: normalizeScore(result.scoreBreakdown.SN),
-    },
-    {
-      label: 'Initiative',
-      value: normalizeScore(result.scoreBreakdown.EI),
-    },
-    {
-      label: 'Rigueur',
-      value: normalizeScore(result.scoreBreakdown.JP),
-    },
+    { label: 'Créativité', value: normalizeScore(result.scoreBreakdown.SN) },
+    { label: 'Initiative', value: normalizeScore(result.scoreBreakdown.EI) },
+    { label: 'Rigueur', value: normalizeScore(result.scoreBreakdown.JP) },
     {
       label: 'Esprit pratique',
       value: normalizeScore(-result.scoreBreakdown.SN),
     },
-    {
-      label: 'Autonomie',
-      value: normalizeScore(-result.scoreBreakdown.EI),
-    },
-    {
-      label: 'Collaboration',
-      value: normalizeScore(result.scoreBreakdown.TF),
-    },
+    { label: 'Autonomie', value: normalizeScore(-result.scoreBreakdown.EI) },
+    { label: 'Collaboration', value: normalizeScore(result.scoreBreakdown.TF) },
   ];
+
+  const handleContinue = async () => {
+    await refreshUser();
+    navigation.navigate('HomeMain');
+  };
 
   return (
     <ImageBackground
@@ -85,7 +80,7 @@ export default function PersonalityResultScreen({
           )}
           scrollEventThrottle={16}
         >
-          <ProfileHeader label={result.label} showLogo={true} />
+          <ProfileHeader label={result.label} showLogo />
 
           <View style={styles.chartContainer}>
             <RadarChart data={radarData} />
@@ -103,10 +98,10 @@ export default function PersonalityResultScreen({
             <TagList items={result.weaknesses} variant="warning" />
           </ProfileSection>
 
-          <ProfileSection title="Métiers recommandés" isLast={true}>
+          <ProfileSection title="Métiers recommandés" isLast>
             <View style={styles.jobsList}>
-              {result.recommendedJobs.map((job, index) => (
-                <View key={index} style={styles.jobItem}>
+              {result.recommendedJobs.map((job, i) => (
+                <View key={i} style={styles.jobItem}>
                   <View style={styles.jobBullet} />
                   <Text style={styles.jobText}>{job}</Text>
                 </View>
@@ -115,43 +110,17 @@ export default function PersonalityResultScreen({
           </ProfileSection>
         </ScrollView>
 
-        <FloatingActionButton onPress={onContinue} scrollY={scrollY} />
+        <FloatingActionButton scrollY={scrollY} onPress={handleContinue} />
       </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 120,
-  },
-  logoContainer: {
-    paddingVertical: 20,
-    paddingTop: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    backgroundColor: Colors.background,
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.greyDark.normal,
-    textAlign: 'center',
-  },
+  background: { flex: 1 },
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingBottom: 120 },
   chartContainer: {
     backgroundColor: Colors.background,
     paddingVertical: 30,
@@ -164,9 +133,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: Colors.greyDark.normal,
   },
-  jobsList: {
-    gap: 12,
-  },
+  jobsList: { gap: 12 },
   jobItem: {
     flexDirection: 'row',
     alignItems: 'center',

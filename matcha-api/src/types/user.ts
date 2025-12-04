@@ -1,4 +1,7 @@
 import { Document, Types } from 'mongoose';
+import z from 'zod';
+
+import { updateProfileSchema } from '@/validators/profile.schema';
 
 export interface UserProfile {
   _id: string;
@@ -21,6 +24,8 @@ export interface UserProfile {
   avatarUrl?: string;
   subscription: 'free' | 'premium';
   isEmailVerified: boolean;
+  consentAccepted: boolean;
+  consentTimestamp?: Date | string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,23 +38,7 @@ export interface UserRegisterInput {
   consentAccepted: boolean;
 }
 
-export interface UserProfileUpdateInput {
-  birthYear?: number;
-  gender?: 'male' | 'female' | 'other' | 'undisclosed';
-  jobTypes?: string[];
-  locationPref?: 'remote' | 'hybrid' | 'on-site';
-  remote?: boolean;
-  addressStreet?: string;
-  addressCity?: string;
-  addressPostalCode?: string;
-  addressCountry?: string;
-  location?: {
-    type: 'Point';
-    coordinates: [number, number];
-  };
-  skillsAssessmentId?: string;
-  personalityTestId?: string;
-}
+export type UserProfileUpdateInput = z.infer<typeof updateProfileSchema>;
 
 export interface UserDocument extends Document {
   _id: Types.ObjectId;

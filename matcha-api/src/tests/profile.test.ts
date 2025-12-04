@@ -75,7 +75,10 @@ describe('PATCH /api/profile', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
-    expect(res.body.errors.some((e: any) => e.path === 'gender')).toBe(true);
+
+    expect(res.body.errors.some((e: any) => e.path?.includes('gender'))).toBe(
+      true,
+    );
   });
 
   it('should reject invalid coordinates', async () => {
@@ -87,14 +90,54 @@ describe('PATCH /api/profile', () => {
       .send({
         location: {
           type: 'Point',
-          coordinates: ['not', 'valid'],
+          coordinates: ['not', 'valid'], // invalid type
         },
       });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
+
     expect(
-      res.body.errors.some((e: any) => e.path.includes('coordinates')),
+      res.body.errors.some(
+        (e: any) =>
+          e.path?.includes('location') || e.path?.includes('coordinates'),
+      ),
+    ).toBe(true);
+  });
+
+  it('should reject empty payload', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const res = await request(app)
+      .patch(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+
+    expect(
+      res.body.errors.some((e: any) =>
+        e.message?.includes('At least one field must be provided'),
+      ),
+    ).toBe(true);
+  });
+
+  it('should reject email in PATCH /profile', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const res = await request(app)
+      .patch(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'newemail@example.com' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+
+    expect(
+      res.body.errors.some((e: any) =>
+        e.message?.toLowerCase().includes('unrecognized'),
+      ),
     ).toBe(true);
   });
 });
@@ -210,5 +253,70 @@ describe('POST /api/profile/change-password', () => {
 
     expect(res.status).toBe(401);
     expect(res.body.message).toMatch(/missing/i);
+  });
+});
+
+describe('POST /api/profile/request-email-change', () => {
+  it('should return 401 if no token is provided', async () => {
+    const res = await request(app)
+      .post(`${BASE_URL}/request-email-change`)
+      .send({ newEmail: 'new@mail.com' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.message).toMatch(/missing|invalid/i);
+  });
+
+  it('should reject invalid email format', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const res = await request(app)
+      .post(`${BASE_URL}/request-email-change`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ newEmail: 'not-an-email' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+
+    expect(res.body.errors.some((e: any) => e.path?.includes('newEmail'))).toBe(
+      true,
+    );
+  });
+
+  it('should reject email already in use', async () => {
+    const { token } = await createUserAndGetToken();
+
+    await User.create({
+      firstName: 'Dup',
+      lastName: 'Licate',
+      email: 'already@used.com',
+      passwordHash: 'hash',
+      consentAccepted: true,
+      isEmailVerified: true,
+    });
+
+    const res = await request(app)
+      .post(`${BASE_URL}/request-email-change`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ newEmail: 'already@used.com' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/already in use/i);
+  });
+
+  it('should store pendingEmail + token when request is valid', async () => {
+    const { token } = await createUserAndGetToken();
+
+    const newEmail = 'update-me@example.com';
+
+    await request(app)
+      .post(`${BASE_URL}/request-email-change`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ newEmail });
+
+    const updated = await User.findOne({ pendingEmail: newEmail });
+
+    expect(updated).not.toBeNull();
+    expect(updated!.emailVerificationToken).toBeTruthy();
+    expect(updated!.emailVerificationTokenExpires).toBeInstanceOf(Date);
   });
 });

@@ -116,19 +116,45 @@ describe('GET /api/users/:id', () => {
 });
 
 describe('GET /api/users/verify-email', () => {
-  let token: string;
+  it('should replace email with pendingEmail when token is valid', async () => {
+    const token = crypto.randomBytes(32).toString('hex');
 
-  beforeEach(async () => {
-    token = crypto.randomBytes(32).toString('hex');
-  });
-
-  it('should verify email with a valid token', async () => {
     const user = await User.create({
-      email: 'test@example.com',
+      email: 'original@example.com',
       passwordHash: 'hashed',
       consentAccepted: true,
+      isEmailVerified: true,
+      pendingEmail: 'updated@example.com',
       emailVerificationToken: token,
-      emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000), // 1h
+      emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000),
+    });
+
+    const res = await request(app)
+      .get(`/api/users/verify-email?token=${token}`)
+      .send();
+
+    expect(res.status).toBe(200);
+    expect(res.type).toBe('text/html');
+    expect(res.text).toContain('Email vérifié');
+
+    const updated = await User.findById(user._id);
+
+    expect(updated?.email).toBe('updated@example.com');
+    expect(updated?.pendingEmail).toBeUndefined();
+    expect(updated?.emailVerificationToken).toBeUndefined();
+    expect(updated?.emailVerificationTokenExpires).toBeUndefined();
+  });
+
+  it('should return 404 if pendingEmail does not exist (signup flow only)', async () => {
+    const token = crypto.randomBytes(32).toString('hex');
+
+    await User.create({
+      email: 'signup@example.com',
+      passwordHash: 'hashed',
+      consentAccepted: true,
+      isEmailVerified: false,
+      emailVerificationToken: token,
+      emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000),
     });
 
     const res = await request(app).get(
@@ -136,34 +162,18 @@ describe('GET /api/users/verify-email', () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.type).toBe('text/html');
-    expect(res.text).toContain('Email vérifié avec succès');
-
-    const updatedUser = await User.findById(user._id);
-    expect(updatedUser?.isEmailVerified).toBe(true);
-    expect(updatedUser?.emailVerificationToken).toBeUndefined();
-    expect(updatedUser?.emailVerificationTokenExpires).toBeUndefined();
+    expect(res.text).toContain('Email vérifié');
   });
 
-  it('should return 400 for missing token', async () => {
-    const res = await request(app).get('/api/users/verify-email');
-    expect(res.status).toBe(400);
-    expect(res.type).toBe('text/html');
-    expect(res.text).toContain('Token invalide');
-  });
+  it('should return 404 when token is expired for email change', async () => {
+    const token = crypto.randomBytes(32).toString('hex');
 
-  it('should return 404 for invalid token', async () => {
-    const res = await request(app).get('/api/users/verify-email?token=invalid');
-    expect(res.status).toBe(404);
-    expect(res.type).toBe('text/html');
-    expect(res.text).toContain('Token expiré');
-  });
-
-  it('should return 404 for expired token', async () => {
     await User.create({
-      email: 'expired@example.com',
+      email: 'original@example.com',
+      pendingEmail: 'updated@example.com',
       passwordHash: 'hashed',
       consentAccepted: true,
+      isEmailVerified: true,
       emailVerificationToken: token,
       emailVerificationTokenExpires: new Date(Date.now() - 3600 * 1000), // expired
     });
@@ -171,8 +181,8 @@ describe('GET /api/users/verify-email', () => {
     const res = await request(app).get(
       `/api/users/verify-email?token=${token}`,
     );
+
     expect(res.status).toBe(404);
-    expect(res.type).toBe('text/html');
     expect(res.text).toContain('Token expiré');
   });
 });

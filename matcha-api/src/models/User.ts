@@ -10,10 +10,13 @@ const UserSchema = new Schema(
       lowercase: true,
       trim: true,
     },
+    pendingEmail: { type: String, default: undefined },
+
     passwordHash: {
       type: String,
       required: true,
     },
+
     firstName: { type: String, trim: true },
     lastName: { type: String, trim: true },
 
@@ -55,7 +58,7 @@ const UserSchema = new Schema(
         required: true,
       },
       coordinates: {
-        type: [Number], // [lng, lat]
+        type: [Number],
         default: [0, 0],
         required: true,
       },
@@ -81,5 +84,12 @@ const UserSchema = new Schema(
 
 // Index géospatial
 UserSchema.index({ location: '2dsphere' });
+
+UserSchema.pre('save', function (next) {
+  if (this.isModified('consentAccepted')) {
+    this.consentTimestamp = new Date();
+  }
+  next();
+});
 
 export default model('User', UserSchema);

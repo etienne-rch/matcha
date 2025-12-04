@@ -23,3 +23,10 @@ export async function deleteAccount() {
   const response = await api.delete('/api/profile/account');
   return response.data;
 }
+
+export async function requestEmailChange(newEmail: string) {
+  const response = await api.post('/api/profile/request-email-change', {
+    newEmail,
+  });
+  return response.data;
+}

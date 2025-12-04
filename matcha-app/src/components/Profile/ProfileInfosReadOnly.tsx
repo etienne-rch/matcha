@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Button } from 'react-native-paper';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import EditableSection from '@/components/UI/EditableSection';
 import { UserFull } from '@/types/user';
@@ -23,21 +22,13 @@ export default function ProfileInfosReadOnly({
     | 'privacy'
     | 'email'
     | 'password';
-  setEditSection: (
-    x:
-      | null
-      | 'personal'
-      | 'address'
-      | 'work'
-      | 'privacy'
-      | 'email'
-      | 'password',
-  ) => void;
+  setEditSection: (x: any) => void;
   onSaved: () => void;
   onDelete: () => void;
 }) {
   return (
-    <View style={{ gap: 24 }}>
+    <View style={{ marginTop: 10 }}>
+      {/* PERSONAL */}
       <EditableSection
         title="Informations personnelles"
         isEditing={editSection === 'personal'}
@@ -62,6 +53,7 @@ export default function ProfileInfosReadOnly({
         )}
       </EditableSection>
 
+      {/* EMAIL */}
       <EditableSection
         title="Adresse e-mail"
         isEditing={editSection === 'email'}
@@ -87,6 +79,7 @@ export default function ProfileInfosReadOnly({
         )}
       </EditableSection>
 
+      {/* PASSWORD */}
       <EditableSection
         title="Mot de passe"
         isEditing={editSection === 'password'}
@@ -101,11 +94,12 @@ export default function ProfileInfosReadOnly({
           />
         ) : (
           <ReadOnlyInfos
-            data={[{ label: 'Mot de passe', value: '************' }]}
+            data={[{ label: 'Mot de passe', value: '*************' }]}
           />
         )}
       </EditableSection>
 
+      {/* ADDRESS */}
       <EditableSection
         title="Adresse"
         isEditing={editSection === 'address'}
@@ -123,16 +117,14 @@ export default function ProfileInfosReadOnly({
             data={[
               { label: 'Rue', value: user.addressStreet ?? '—' },
               { label: 'Ville', value: user.addressCity ?? '—' },
-              {
-                label: 'Code postal',
-                value: user.addressPostalCode ?? '—',
-              },
+              { label: 'Code postal', value: user.addressPostalCode ?? '—' },
               { label: 'Pays', value: user.addressCountry ?? '—' },
             ]}
           />
         )}
       </EditableSection>
 
+      {/* WORK */}
       <EditableSection
         title="Préférences de travail"
         isEditing={editSection === 'work'}
@@ -163,6 +155,7 @@ export default function ProfileInfosReadOnly({
         )}
       </EditableSection>
 
+      {/* PRIVACY */}
       <EditableSection
         title="Confidentialité & RGPD"
         isEditing={editSection === 'privacy'}
@@ -187,23 +180,18 @@ export default function ProfileInfosReadOnly({
         )}
       </EditableSection>
 
+      {/* DELETE ACCOUNT */}
       <View style={styles.dangerCard}>
         <Text style={styles.dangerTitle}>Suppression du compte</Text>
 
         <Text style={styles.dangerText}>
           La suppression de ton compte est définitive. Toutes tes données seront
-          effacées conformément au RGPD.
+          effacées.
         </Text>
 
-        <Button
-          mode="outlined"
-          onPress={onDelete}
-          textColor="#b30000"
-          style={styles.deleteButton}
-          labelStyle={styles.deleteButtonLabel}
-        >
-          Supprimer mon compte
-        </Button>
+        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonLabel}>Supprimer mon compte</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -211,7 +199,7 @@ export default function ProfileInfosReadOnly({
 
 function ReadOnlyInfos({ data }: { data: { label: string; value: any }[] }) {
   return (
-    <View>
+    <View style={styles.readOnlyWrapper}>
       {data.map((row, i) => (
         <View key={i} style={styles.row}>
           <Text style={styles.label}>{row.label}</Text>
@@ -242,15 +230,29 @@ function formatLocationPref(t?: string) {
 }
 
 const styles = StyleSheet.create({
-  row: { marginBottom: 12 },
-  label: { fontSize: 12, color: '#777' },
-  value: { fontSize: 15, fontWeight: '600' },
+  readOnlyWrapper: {
+    gap: 10,
+  },
+
+  row: {
+    marginBottom: 4,
+  },
+  label: {
+    fontSize: 12,
+    color: '#888',
+  },
+  value: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#062314',
+    marginTop: 2,
+  },
 
   dangerCard: {
-    marginTop: 40,
-    padding: 16,
-    backgroundColor: '#fff4f4',
+    backgroundColor: '#fff5f5',
+    padding: 20,
     borderRadius: 14,
+    marginTop: 18,
   },
   dangerTitle: {
     fontSize: 16,
@@ -262,15 +264,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#444',
     marginBottom: 16,
+    lineHeight: 19,
   },
 
   deleteButton: {
-    alignSelf: 'flex-start',
+    borderWidth: 1,
     borderColor: '#b30000',
-    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
   },
   deleteButtonLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
+    color: '#b30000',
   },
 });

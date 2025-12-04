@@ -4,12 +4,14 @@ import {
   changePassword,
   deleteAccount,
   getProfile,
+  requestEmailChange,
   updateProfile,
 } from '@/controllers/profile.controller';
 import { requireAuth } from '@/middlewares/auth.middleware';
 import { validate } from '@/middlewares/validate.middleware';
 import {
   changePasswordSchema,
+  requestEmailChangeSchema,
   updateProfileSchema,
 } from '@/validators/profile.schema';
 
@@ -26,6 +28,13 @@ router.post(
   requireAuth,
   validate(changePasswordSchema),
   changePassword,
+);
+
+router.post(
+  '/request-email-change',
+  requireAuth,
+  validate(requestEmailChangeSchema),
+  requestEmailChange,
 );
 
 export default router;

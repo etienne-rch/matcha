@@ -18,6 +18,8 @@ export const mapUserToProfile = (user: any): UserProfile => ({
   avatarUrl: user.avatarUrl,
   subscription: user.subscription,
   isEmailVerified: user.isEmailVerified,
+  consentAccepted: user.consentAccepted,
+  consentTimestamp: user.consentTimestamp,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });

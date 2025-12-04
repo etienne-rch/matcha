@@ -38,6 +38,26 @@ export function useProfile() {
         consentAccepted: data.consentAccepted,
         consentEmail: data.consentEmail,
         consentData: data.consentData,
+
+        personalityTestId: data.personalityTestId,
+        skillsAssessmentId: data.skillsAssessmentId,
+
+        personality: data.personality
+          ? {
+              type: data.personality.type,
+              label: data.personality.label,
+              description: data.personality.description,
+              strengths: data.personality.strengths || [],
+              weaknesses: data.personality.weaknesses || [],
+              recommendedJobs: data.personality.recommendedJobs || [],
+              scoreBreakdown: {
+                EI: data.personality.scoreBreakdown?.EI ?? 0,
+                SN: data.personality.scoreBreakdown?.SN ?? 0,
+                TF: data.personality.scoreBreakdown?.TF ?? 0,
+                JP: data.personality.scoreBreakdown?.JP ?? 0,
+              },
+            }
+          : null,
       };
 
       setUser(normalized);

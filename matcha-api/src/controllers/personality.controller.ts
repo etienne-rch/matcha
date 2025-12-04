@@ -96,3 +96,18 @@ export const submitTest = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const resetTest = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  if (user.personalityTestId) {
+    await PersonalityTest.findByIdAndDelete(user.personalityTestId);
+    user.personalityTestId = undefined;
+    await user.save();
+  }
+
+  res.json({ message: 'Personality test reset' });
+};

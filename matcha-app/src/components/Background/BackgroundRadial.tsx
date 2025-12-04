@@ -18,6 +18,7 @@ export default function BackgroundRadial({
         start={{ x: 0.5, y: 1 }} // du bas
         end={{ x: 0.5, y: 0 }} // vers le haut
         style={StyleSheet.absoluteFillObject}
+        pointerEvents="none"
       />
       {children}
     </View>

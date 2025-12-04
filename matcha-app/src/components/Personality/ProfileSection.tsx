@@ -24,18 +24,25 @@ export default function ProfileSection({
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: Colors.background,
+    backgroundColor: 'rgba(255,255,255,0.97)',
+    marginHorizontal: 20,
     marginTop: 16,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
   lastSection: {
-    marginBottom: 0,
+    marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.orange.normal,
-    marginBottom: 16,
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.greenDark.normal,
+    marginBottom: 14,
   },
 });

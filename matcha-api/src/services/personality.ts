@@ -22,9 +22,7 @@ export async function computePersonality(userId: string, answers: Answer[]) {
   // Calcul du score pour chaque dimension
   for (const ans of answers) {
     const q = template.questions.find((q: any) => q.id === ans.questionId);
-    if (q && q.dimension && scores[q.dimension] !== undefined) {
-      scores[q.dimension] += ans.value;
-    }
+    if (q && q.dimension) scores[q.dimension] += ans.value;
   }
 
   // Détermination du type MBTI à partir du signe de chaque score
@@ -43,18 +41,23 @@ export async function computePersonality(userId: string, answers: Answer[]) {
     templateId: template._id,
     templateVersion: template.version,
     answers,
-    scoreBreakdown: scores,
+
     type,
     result: profile?.label ?? 'Profil neutre',
-    traits: profile ? [profile.label, ...(profile.strengths ?? [])] : [],
+
+    description: profile?.description ?? '',
+    traits: profile?.strengths ?? [],
+    weaknesses: profile?.weaknesses ?? [],
     motivationProfile: profile?.recommendedJobs ?? [],
+
+    scoreBreakdown: scores,
   });
 
-  // Mise à jour de l'utilisateur avec le personalityTestId
   await User.findByIdAndUpdate(userId, { personalityTestId: test._id });
 
   // Retourne un résumé structuré
   return {
+    testId: test._id,
     type,
     label: profile?.label ?? 'Profil neutre',
     description: profile?.description,
@@ -62,6 +65,5 @@ export async function computePersonality(userId: string, answers: Answer[]) {
     weaknesses: profile?.weaknesses ?? [],
     recommendedJobs: profile?.recommendedJobs ?? [],
     scoreBreakdown: scores,
-    testId: test._id,
   };
 }

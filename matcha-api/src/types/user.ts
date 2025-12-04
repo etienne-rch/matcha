@@ -26,6 +26,21 @@ export interface UserProfile {
   isEmailVerified: boolean;
   consentAccepted: boolean;
   consentTimestamp?: Date | string;
+  personality?: {
+    type: string;
+    label: string;
+    description: string | null;
+    strengths: string[];
+    weaknesses: string[];
+    recommendedJobs: string[];
+    scoreBreakdown: {
+      EI: number;
+      SN: number;
+      TF: number;
+      JP: number;
+    };
+    testId: string;
+  } | null;
   createdAt: Date;
   updatedAt: Date;
 }

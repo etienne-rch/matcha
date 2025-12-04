@@ -71,3 +71,7 @@ export const submitPersonalityTest = async (
   const response = await api.post('/api/personality/submit', { answers });
   return response.data.data;
 };
+
+export const resetPersonalityTest = async (): Promise<void> => {
+  await api.post('/api/personality/reset');
+};

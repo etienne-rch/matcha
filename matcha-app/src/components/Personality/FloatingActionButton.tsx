@@ -16,13 +16,13 @@ export default function FloatingActionButton({
 }: FloatingActionButtonProps) {
   const buttonScale = scrollY.interpolate({
     inputRange: [0, 100, 500],
-    outputRange: [0.8, 1, 1],
+    outputRange: [0.9, 1, 1],
     extrapolate: 'clamp',
   });
 
   const buttonOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0.5, 1],
+    inputRange: [0, 80],
+    outputRange: [0.6, 1],
     extrapolate: 'clamp',
   });
 
@@ -50,27 +50,27 @@ export default function FloatingActionButton({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 40,
-    right: 30,
+    bottom: 32,
+    right: 24,
     zIndex: 10,
   },
   button: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: Colors.greenDark.normal,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowColor: '#062314',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 10,
     elevation: 8,
   },
   icon: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '700',
     color: Colors.background,
-    lineHeight: 28,
+    lineHeight: 26,
   },
 });

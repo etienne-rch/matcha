@@ -3,13 +3,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -18,6 +18,8 @@ import {
   getActivePersonalityTest,
   submitPersonalityTest,
 } from '@/api/personality';
+import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
+import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import { QuestionCard, TestHeader } from '@/components/Personality';
 import { useAuth } from '@/hooks/useAuth';
 import Colors from '@/themes/colors';
@@ -49,10 +51,7 @@ export default function PersonalityTestScreen() {
         await refreshUser();
         return;
       }
-
-      if (response.test) {
-        setTest(response.test);
-      }
+      if (response.test) setTest(response.test);
     } catch (error: any) {
       Toast.show({
         type: 'error',
@@ -71,21 +70,16 @@ export default function PersonalityTestScreen() {
 
     if (!test) return;
 
-    const currentIndex = test.questions.findIndex((q) => q.id === questionId);
-    if (currentIndex < test.questions.length - 1) {
-      const nextQuestion = test.questions[currentIndex + 1];
-
+    const index = test.questions.findIndex((q) => q.id === questionId);
+    if (index < test.questions.length - 1) {
+      const next = test.questions[index + 1];
       setTimeout(() => {
-        const nextView = questionRefs.current.get(nextQuestion.id);
-        if (nextView) {
-          nextView.measureLayout(
+        const ref = questionRefs.current.get(next.id);
+        if (ref) {
+          ref.measureLayout(
             scrollViewRef.current as any,
-            (_, y) => {
-              scrollViewRef.current?.scrollTo({
-                y: y - 20,
-                animated: true,
-              });
-            },
+            (_, y) =>
+              scrollViewRef.current?.scrollTo({ y: y - 20, animated: true }),
             () => {},
           );
         }
@@ -95,14 +89,12 @@ export default function PersonalityTestScreen() {
 
   const handleSubmit = async () => {
     if (!test) return;
-
     if (answers.size !== test.questions.length) {
-      Toast.show({
+      return Toast.show({
         type: 'error',
         text1: 'Test incomplet',
         text2: 'Veuillez répondre à toutes les questions',
       });
-      return;
     }
 
     setSubmitting(true);
@@ -110,22 +102,11 @@ export default function PersonalityTestScreen() {
     try {
       const formattedAnswers: PersonalityAnswer[] = Array.from(
         answers.entries(),
-      ).map(([questionId, value]) => ({
-        questionId,
-        value,
-      }));
+      ).map(([id, value]) => ({ questionId: id, value }));
 
       const testResult = await submitPersonalityTest(formattedAnswers);
 
-      Toast.show({
-        type: 'success',
-        text1: 'Test terminé !',
-        text2: 'Votre profil de personnalité a été enregistré',
-      });
-
-      navigation.navigate('PersonalityResult', {
-        result: testResult,
-      });
+      navigation.navigate('PersonalityResult', { result: testResult });
     } catch (error: any) {
       Toast.show({
         type: 'error',
@@ -148,159 +129,143 @@ export default function PersonalityTestScreen() {
 
   if (!test) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorTitle}>Aucun test disponible</Text>
-        <Text style={styles.errorMessage}>
-          Le test de personnalité n'a pas pu être chargé.{'\n'}
-          Vérifiez que le backend est démarré et que le test a été seedé.
-        </Text>
-        <TouchableOpacity style={styles.retryButton} onPress={loadTest}>
-          <Text style={styles.retryButtonText}>Réessayer</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={async () => {
-            await logout();
-          }}
-        >
-          <Text style={styles.logoutButtonText}>Se déconnecter</Text>
-        </TouchableOpacity>
-      </View>
+      <BackgroundRadial>
+        <View style={styles.bubblesLayer}>
+          <BackgroundBubbles />
+        </View>
+
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.centerContainer}>
+            <Text style={styles.errorTitle}>Aucun test disponible</Text>
+            <Text style={styles.errorMessage}>
+              Le test de personnalité n'a pas pu être chargé.{'\n'}
+              Vérifiez que le backend est démarré et que le test a été seedé.
+            </Text>
+
+            <TouchableOpacity style={styles.retryButton} onPress={loadTest}>
+              <Text style={styles.retryButtonText}>Réessayer</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+              <Text style={styles.logoutButtonText}>Se déconnecter</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </BackgroundRadial>
     );
   }
 
   const isComplete = answers.size === test.questions.length;
 
   return (
-    <ImageBackground
-      source={require('@/assets/backgrounds/default.jpg')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.container}>
-        <TestHeader
-          title={test.title}
-          summary={test.summary}
-          currentQuestion={answers.size}
-          totalQuestions={test.questions.length}
-        />
+    <BackgroundRadial>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <TestHeader
+            title={test.title}
+            summary={test.summary}
+            currentQuestion={answers.size}
+            totalQuestions={test.questions.length}
+          />
 
-        <ScrollView
-          ref={scrollViewRef}
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {test.questions.map((question, index) => (
-            <View
-              key={question.id}
-              ref={(ref) => {
-                if (ref) {
-                  questionRefs.current.set(question.id, ref);
-                }
-              }}
-            >
-              <QuestionCard
-                questionNumber={index + 1}
-                questionText={question.text}
-                options={question.options}
-                selectedValue={answers.get(question.id)}
-                onAnswer={(value) => handleAnswer(question.id, value)}
-              />
-            </View>
-          ))}
-
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              (!isComplete || submitting) && styles.submitButtonDisabled,
-            ]}
-            onPress={handleSubmit}
-            disabled={!isComplete || submitting}
+          <ScrollView
+            ref={scrollViewRef}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
           >
-            {submitting ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.submitButtonText}>
-                {isComplete
-                  ? 'Terminer le test'
-                  : 'Complétez toutes les questions'}
-              </Text>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-    </ImageBackground>
+            {test.questions.map((q, index) => (
+              <View
+                key={q.id}
+                ref={(ref) => {
+                  if (ref) {
+                    questionRefs.current.set(q.id, ref);
+                  }
+                }}
+              >
+                <QuestionCard
+                  questionNumber={index + 1}
+                  questionText={q.text}
+                  options={q.options}
+                  selectedValue={answers.get(q.id)}
+                  onAnswer={(value) => handleAnswer(q.id, value)}
+                />
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                (!isComplete || submitting) && styles.submitButtonDisabled,
+              ]}
+              disabled={!isComplete || submitting}
+              onPress={handleSubmit}
+            >
+              {submitting ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>
+                  {isComplete
+                    ? 'Terminer le test'
+                    : 'Complétez toutes les questions'}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </SafeAreaView>
+    </BackgroundRadial>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1 },
+  bubblesLayer: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
   background: { flex: 1 },
-  container: { flex: 1 },
+  container: { flex: 1, zIndex: 2 },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.greyLight.normal,
+    paddingHorizontal: 24,
   },
   scrollView: { flex: 1 },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
-  },
+  scrollContent: { padding: 20, paddingBottom: 40 },
   submitButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#0A2916',
+    paddingVertical: 16,
     borderRadius: 12,
-    padding: 16,
     alignItems: 'center',
     marginTop: 20,
   },
-  submitButtonDisabled: {
-    backgroundColor: Colors.greyLight.dark.normal,
-    opacity: 0.6,
-  },
-  submitButtonText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  submitButtonDisabled: { opacity: 0.5 },
+  submitButtonText: { color: 'white', fontWeight: '600', fontSize: 16 },
   errorTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.error,
+    color: 'red',
+    fontSize: 22,
+    fontWeight: '700',
     marginBottom: 12,
-    textAlign: 'center',
   },
   errorMessage: {
-    fontSize: 14,
-    color: Colors.greyDark.normal,
+    fontSize: 15,
     textAlign: 'center',
-    paddingHorizontal: 32,
-    marginBottom: 24,
-    lineHeight: 20,
+    marginBottom: 22,
+    color: '#333',
+    lineHeight: 22,
   },
   retryButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
+    backgroundColor: '#0A2916',
     paddingVertical: 12,
-    paddingHorizontal: 32,
+    paddingHorizontal: 28,
+    borderRadius: 12,
     marginBottom: 12,
   },
-  retryButtonText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  retryButtonText: { color: 'white', fontWeight: '600' },
   logoutButton: {
-    backgroundColor: Colors.greyLight.normal,
-    borderRadius: 12,
+    borderWidth: 1.5,
     paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderWidth: 1,
-    borderColor: Colors.greyLight.dark.normal,
+    paddingHorizontal: 28,
+    borderRadius: 12,
+    borderColor: '#0A2916',
   },
-  logoutButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  logoutButtonText: { color: '#0A2916', fontWeight: '600' },
 });

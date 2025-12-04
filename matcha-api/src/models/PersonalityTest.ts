@@ -41,7 +41,9 @@ const PersonalityTestSchema = new Schema(
     // résultat calculé
     type: { type: String, required: true, trim: true }, // e.g. ENTP
     result: { type: String, required: true, trim: true }, // e.g. "Innovateur" (label)
+    description: { type: String },
     traits: { type: [String], default: [] }, // forces synthétiques
+    weaknesses: { type: [String], default: [] },
     motivationProfile: { type: [String], default: [] }, // jobs suggérés
 
     // détails du scoring pour transparence & debug

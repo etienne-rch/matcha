@@ -1,3 +1,19 @@
+export interface PersonalitySummary {
+  type: string; // "INTJ"
+  label: string; // "Le Stratège"
+  description: string; // Texte complet
+  strengths: string[]; // Ex: ["Créatif", "Logique"]
+  weaknesses: string[]; // Ex: ["Impulsif", "Impatient"]
+  recommendedJobs: string[]; // Ex: ["Product Manager", "UX Designer"]
+
+  scoreBreakdown: {
+    EI: number;
+    SN: number;
+    TF: number;
+    JP: number;
+  };
+}
+
 export interface UserFull {
   id: string;
 
@@ -32,4 +48,6 @@ export interface UserFull {
     type: 'Point';
     coordinates: [number, number];
   };
+
+  personality?: PersonalitySummary | null;
 }

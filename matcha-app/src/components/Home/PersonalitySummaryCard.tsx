@@ -8,7 +8,7 @@ export default function PersonalitySummaryCard({ personality, onPress }: any) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Ton profil Matcha</Text>
+      <Text style={styles.title}>Ta personnalité</Text>
 
       <Text style={styles.label}>{personality.label}</Text>
 

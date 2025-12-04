@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { resetPassword } from '@/api/auth';
 import { newPasswordSchema } from '@/schemas/password-reset';
-import { styles } from '@/themes/styles';
 import { validateZod } from '@/utils/validation';
 
 import { NewPasswordFormProps } from './types';
@@ -43,26 +42,19 @@ export default function NewPasswordForm({
       Toast.show({
         type: 'success',
         text1: 'Mot de passe réinitialisé',
-        text2: 'Vous pouvez maintenant vous connecter',
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
+        text2: 'Vous pouvez maintenant vous connecter.',
       });
 
-      setTimeout(onSuccess, 1500);
+      setTimeout(onSuccess, 1200);
     } catch (err: any) {
       const errorMessage =
-        err?.response?.data?.message || 'Le token est invalide ou a expiré';
+        err?.response?.data?.message || 'Le token est invalide ou expiré.';
       setError(errorMessage);
+
       Toast.show({
         type: 'error',
         text1: 'Échec de la réinitialisation',
         text2: errorMessage,
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
       });
     } finally {
       setLoading(false);
@@ -78,8 +70,8 @@ export default function NewPasswordForm({
         mode="outlined"
         secureTextEntry={!showPassword}
         style={styles.input}
-        error={!!error}
         disabled={loading}
+        error={!!error}
         right={
           <TextInput.Icon
             icon={showPassword ? 'eye-off' : 'eye'}
@@ -87,6 +79,7 @@ export default function NewPasswordForm({
           />
         }
       />
+
       <TextInput
         label="Confirmer le mot de passe"
         value={confirm}
@@ -94,8 +87,8 @@ export default function NewPasswordForm({
         mode="outlined"
         secureTextEntry={!showConfirm}
         style={styles.input}
-        error={!!error}
         disabled={loading}
+        error={!!error}
         right={
           <TextInput.Icon
             icon={showConfirm ? 'eye-off' : 'eye'}
@@ -103,7 +96,9 @@ export default function NewPasswordForm({
           />
         }
       />
+
       {error && <HelperText type="error">{error}</HelperText>}
+
       <Button
         mode="contained"
         onPress={handleSubmit}
@@ -116,3 +111,17 @@ export default function NewPasswordForm({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  input: {
+    marginBottom: 8,
+  },
+  continueButton: {
+    marginTop: 12,
+    borderRadius: 12,
+  },
+});

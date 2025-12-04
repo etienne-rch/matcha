@@ -1,27 +1,25 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { registrationSchema } from '@/schemas/registration';
-import { styles } from '@/themes/styles';
 import { AuthStackParamList } from '@/types/navigation';
 import { validateZod } from '@/utils/validation';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
+type NavProps = NativeStackNavigationProp<AuthStackParamList>;
 
 export default function RegistrationForm() {
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<NavProps>();
   const { register } = useAuth();
 
   const [firstName, setFirstname] = useState('');
   const [lastName, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -56,29 +54,15 @@ export default function RegistrationForm() {
       Toast.show({
         type: 'success',
         text1: 'Inscription réussie',
-        text2: 'Vérifiez votre email pour confirmer votre compte',
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
+        text2: 'Vérifie tes emails pour activer ton compte.',
       });
 
-      setFirstname('');
-      setLastname('');
-      setEmail('');
-      setPassword('');
-
-      // Redirection vers l'écran de connexion après un court délai
-      setTimeout(() => navigation.navigate('Login'), 1000);
+      navigation.navigate('Login');
     } catch {
       Toast.show({
         type: 'error',
         text1: "Échec de l'inscription",
-        text2: 'Veuillez réessayer',
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
+        text2: 'Veuillez réessayer.',
       });
     } finally {
       setLoading(false);
@@ -117,9 +101,9 @@ export default function RegistrationForm() {
         label="Email"
         value={email}
         onChangeText={setEmail}
-        mode="outlined"
-        keyboardType="email-address"
         autoCapitalize="none"
+        keyboardType="email-address"
+        mode="outlined"
         style={styles.input}
         disabled={loading}
         error={!!errors.email}
@@ -127,11 +111,11 @@ export default function RegistrationForm() {
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
       <TextInput
-        label="Mot de Passe"
+        label="Mot de passe"
         value={password}
         onChangeText={setPassword}
-        mode="outlined"
         secureTextEntry={!showPassword}
+        mode="outlined"
         style={styles.input}
         disabled={loading}
         error={!!errors.password}
@@ -148,13 +132,27 @@ export default function RegistrationForm() {
 
       <Button
         mode="contained"
-        onPress={handleRegister}
         loading={loading}
         disabled={loading}
         style={styles.continueButton}
+        onPress={handleRegister}
       >
         Continuer
       </Button>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  input: {
+    marginBottom: 8,
+  },
+  continueButton: {
+    marginTop: 12,
+    borderRadius: 12,
+  },
+});

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { ImageBackground, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import ConfirmDeleteAccountModal from '@/components/Modals/ConfirmDeleteAccountModal';
 import ProfileHeader from '@/components/Profile/ProfileHeader';
 import ProfileInfosReadOnly from '@/components/Profile/ProfileInfosReadOnly';
 import { useProfile } from '@/hooks/useProfile';
-import { styles } from '@/themes/styles';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, loading, refresh } = useProfile();
@@ -20,12 +20,9 @@ export default function ProfileScreen({ navigation }: any) {
   if (loading || !user) return null;
 
   return (
-    <ImageBackground
-      source={require('@/assets/backgrounds/default.jpg')}
-      style={styles.background}
-    >
-      <SafeAreaView style={styles.safeAreaView}>
-        <ScrollView contentContainerStyle={styles.contentContainer}>
+    <BackgroundRadial>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.container}>
           <ProfileHeader user={user} />
 
           <ProfileInfosReadOnly
@@ -38,14 +35,31 @@ export default function ProfileScreen({ navigation }: any) {
             }}
             onDelete={() => setShowDeleteModal(true)}
           />
-
-          <ConfirmDeleteAccountModal
-            visible={showDeleteModal}
-            onCancel={() => setShowDeleteModal(false)}
-            onConfirm={() => navigation.navigate('Login')}
-          />
         </ScrollView>
+
+        <ConfirmDeleteAccountModal
+          visible={showDeleteModal}
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={() => navigation.navigate('Login')}
+        />
       </SafeAreaView>
-    </ImageBackground>
+    </BackgroundRadial>
   );
 }
+
+const styles = StyleSheet.create({
+  bubblesLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  container: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 40,
+    zIndex: 5,
+  },
+});

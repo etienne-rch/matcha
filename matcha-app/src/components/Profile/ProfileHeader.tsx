@@ -1,8 +1,6 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
-import rnpTheme from '@/themes/rnpTheme';
 import { UserFull } from '@/types/user';
 
 export default function ProfileHeader({ user }: { user: UserFull }) {
@@ -31,7 +29,7 @@ export default function ProfileHeader({ user }: { user: UserFull }) {
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
-    marginBottom: rnpTheme.spacing.lg,
+    marginBottom: 32,
   },
   avatar: {
     width: 92,
@@ -42,24 +40,25 @@ const styles = StyleSheet.create({
     width: 92,
     height: 92,
     borderRadius: 46,
-    backgroundColor: rnpTheme.colors.greenLight.light.normal,
+    backgroundColor: 'rgba(255,255,255,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   initialsText: {
     fontSize: 32,
     fontWeight: '700',
-    color: rnpTheme.colors.greenDark.normal,
+    color: '#062314',
   },
   name: {
-    marginTop: 12,
-    fontSize: 20,
-    fontWeight: '700',
-    color: rnpTheme.colors.primary,
+    marginTop: 14,
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#062314',
+    letterSpacing: 0.3,
   },
   email: {
     marginTop: 4,
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(0,0,0,0.55)',
   },
 });

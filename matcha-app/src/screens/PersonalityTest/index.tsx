@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,17 +20,20 @@ import {
 } from '@/api/personality';
 import { QuestionCard, TestHeader } from '@/components/Personality';
 import { useAuth } from '@/hooks/useAuth';
-import PersonalityResultScreen from '@/screens/PersonalityResult';
 import Colors from '@/themes/colors';
+import { HomeStackParamList } from '@/types/navigation';
+
+type Nav = NativeStackNavigationProp<HomeStackParamList>;
 
 export default function PersonalityTestScreen() {
+  const navigation = useNavigation<Nav>();
   const { refreshUser, logout } = useAuth();
+
   const [test, setTest] = useState<PersonalityTemplate | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [answers, setAnswers] = useState<Map<string, number>>(new Map());
-  const [result, setResult] = useState<any>(null);
-  const [showResult, setShowResult] = useState(false);
+
   const scrollViewRef = useRef<ScrollView>(null);
   const questionRefs = useRef<Map<string, View>>(new Map());
 
@@ -38,22 +43,17 @@ export default function PersonalityTestScreen() {
 
   const loadTest = async () => {
     try {
-      console.log('📡 Chargement du test...');
       const response = await getActivePersonalityTest();
-      console.log('📊 Réponse:', response);
 
       if (response.completed) {
-        console.log('✅ Test déjà complété, rafraîchissement...');
         await refreshUser();
         return;
       }
 
       if (response.test) {
-        console.log('✅ Test chargé:', response.test.title);
         setTest(response.test);
       }
     } catch (error: any) {
-      console.error('❌ Erreur:', error);
       Toast.show({
         type: 'error',
         text1: 'Erreur',
@@ -69,26 +69,27 @@ export default function PersonalityTestScreen() {
     newAnswers.set(questionId, value);
     setAnswers(newAnswers);
 
-    if (test) {
-      const currentIndex = test.questions.findIndex((q) => q.id === questionId);
-      if (currentIndex < test.questions.length - 1) {
-        const nextQuestion = test.questions[currentIndex + 1];
-        setTimeout(() => {
-          const nextView = questionRefs.current.get(nextQuestion.id);
-          if (nextView) {
-            nextView.measureLayout(
-              scrollViewRef.current as any,
-              (x, y) => {
-                scrollViewRef.current?.scrollTo({
-                  y: y - 20,
-                  animated: true,
-                });
-              },
-              () => {},
-            );
-          }
-        }, 100);
-      }
+    if (!test) return;
+
+    const currentIndex = test.questions.findIndex((q) => q.id === questionId);
+    if (currentIndex < test.questions.length - 1) {
+      const nextQuestion = test.questions[currentIndex + 1];
+
+      setTimeout(() => {
+        const nextView = questionRefs.current.get(nextQuestion.id);
+        if (nextView) {
+          nextView.measureLayout(
+            scrollViewRef.current as any,
+            (_, y) => {
+              scrollViewRef.current?.scrollTo({
+                y: y - 20,
+                animated: true,
+              });
+            },
+            () => {},
+          );
+        }
+      }, 100);
     }
   };
 
@@ -105,6 +106,7 @@ export default function PersonalityTestScreen() {
     }
 
     setSubmitting(true);
+
     try {
       const formattedAnswers: PersonalityAnswer[] = Array.from(
         answers.entries(),
@@ -115,13 +117,14 @@ export default function PersonalityTestScreen() {
 
       const testResult = await submitPersonalityTest(formattedAnswers);
 
-      setResult(testResult);
-      setShowResult(true);
-
       Toast.show({
         type: 'success',
         text1: 'Test terminé !',
         text2: 'Votre profil de personnalité a été enregistré',
+      });
+
+      navigation.navigate('PersonalityResult', {
+        result: testResult,
       });
     } catch (error: any) {
       Toast.show({
@@ -135,23 +138,10 @@ export default function PersonalityTestScreen() {
     }
   };
 
-  const handleContinueFromResult = async () => {
-    await refreshUser();
-  };
-
-  if (showResult && result) {
-    return (
-      <PersonalityResultScreen
-        result={result}
-        onContinue={handleContinueFromResult}
-      />
-    );
-  }
-
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -164,19 +154,12 @@ export default function PersonalityTestScreen() {
           Le test de personnalité n'a pas pu être chargé.{'\n'}
           Vérifiez que le backend est démarré et que le test a été seedé.
         </Text>
-        <TouchableOpacity
-          style={styles.retryButton}
-          onPress={() => {
-            setLoading(true);
-            loadTest();
-          }}
-        >
+        <TouchableOpacity style={styles.retryButton} onPress={loadTest}>
           <Text style={styles.retryButtonText}>Réessayer</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={async () => {
-            const { logout } = useAuth();
             await logout();
           }}
         >
@@ -251,21 +234,15 @@ export default function PersonalityTestScreen() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
+  background: { flex: 1 },
+  container: { flex: 1 },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.greyLight.normal,
   },
-  scrollView: {
-    flex: 1,
-  },
+  scrollView: { flex: 1 },
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
@@ -285,10 +262,6 @@ const styles = StyleSheet.create({
     color: Colors.background,
     fontSize: 16,
     fontWeight: '600',
-  },
-  errorText: {
-    fontSize: 16,
-    color: Colors.error,
   },
   errorTitle: {
     fontSize: 20,

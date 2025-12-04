@@ -116,3 +116,71 @@ Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet ema
 
   logPreviewUrl(info);
 };
+
+export const sendEmailChangeVerification = async (
+  to: string,
+  token: string,
+): Promise<void> => {
+  const transporter = await getTransporter();
+
+  const link = `${API_URL}/api/users/verify-email?token=${token}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <h1 style="color: white; margin: 0;">Matcha</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+          <h2 style="color: #2575fc; margin-top: 0;">Confirme ton changement d'adresse email</h2>
+
+          <p>Tu as demandé à modifier ton adresse email associée à ton compte Matcha.</p>
+
+          <p>Clique sur le bouton ci-dessous pour confirmer cette modification :</p>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${link}"
+               style="background: #2575fc;
+                      color: white;
+                      padding: 14px 24px;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      display: inline-block;
+                      font-weight: bold;">
+              Confirmer mon nouvel email
+            </a>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Ce lien est valable pendant 15 minutes pour des raisons de sécurité.
+          </p>
+
+          <p style="color: #666; font-size: 14px;">
+            Si tu n'es pas à l'origine de cette demande, tu peux ignorer cet email en toute sécurité.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
+
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            Si le bouton ne fonctionne pas, copie et colle ce lien dans ton navigateur :<br />
+            <a href="${link}" style="color: #2575fc;">${link}</a>
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
+
+  const info = await transporter.sendMail({
+    from: `"${APP_NAME}" <${SMTP_USER}>`,
+    to,
+    subject: 'Confirme ton changement d’adresse email',
+    html,
+  });
+
+  logPreviewUrl(info);
+};

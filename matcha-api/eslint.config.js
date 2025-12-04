@@ -32,17 +32,7 @@ module.exports = [
     rules: {
       'no-console': 'warn',
       '@typescript-eslint/no-unused-vars': ['warn'],
-      'import/order': [
-        'error',
-        {
-          alphabetize: { order: 'asc' },
-          groups: [
-            ['builtin', 'external'],
-            'internal',
-            ['parent', 'sibling', 'index'],
-          ],
-        },
-      ],
+      'import/order': 'off',
     },
   },
 ];

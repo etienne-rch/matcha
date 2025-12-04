@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 
 import ChatSession from '@/models/ChatSession';
@@ -89,5 +90,45 @@ export const deleteAccount = async (
       .json({ message: 'Account and related data deleted successfully' });
   } catch (error) {
     next(error);
+  }
+};
+
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId)
+      return res.status(401).json({ message: 'Missing or invalid token' });
+
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({ message: 'The passwords do not match' });
+    }
+
+    const user = await User.findById(userId).select('+passwordHash');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Old password is incorrect' });
+    }
+
+    const sameAsCurrent = await bcrypt.compare(newPassword, user.passwordHash);
+    if (sameAsCurrent) {
+      return res.status(400).json({
+        message: 'New password must be different from the current password',
+      });
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (err) {
+    next(err);
   }
 };

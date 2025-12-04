@@ -1,47 +1,62 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
+import { useAuth } from '@/hooks/useAuth';
+import { loginSchema } from '@/schemas/login';
 import { styles } from '@/themes/styles';
-import { validateEmail, validatePassword } from '@/utils/validation';
+import { validateZod } from '@/utils/validation';
 
 export default function LoginForm() {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
+  const [password, setMotDePasse] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [errors, setErrors] = useState({
-    email: '',
-    motDePasse: '',
-  });
+  const [errors, setErrors] = useState({ email: '', password: '' });
 
-  const validateForm = () => {
-    let valid = true;
-    let newErrors = { email: '', motDePasse: '' };
+  const handleLogin = async () => {
+    const { valid, errors: zodErrors } = validateZod(loginSchema, {
+      email,
+      password,
+    });
 
-    if (!email.trim()) {
-      newErrors.email = 'L’email est requis';
-      valid = false;
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Format d’email invalide';
-      valid = false;
-    }
+    setErrors({
+      email: zodErrors.email || '',
+      password: zodErrors.password || '',
+    });
 
-    if (!motDePasse.trim()) {
-      newErrors.motDePasse = 'Le mot de passe est requis';
-      valid = false;
-    } else if (!validatePassword(motDePasse)) {
-      newErrors.motDePasse =
-        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
-      valid = false;
-    }
+    if (!valid) return;
 
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleLogin = () => {
-    if (validateForm()) {
-      console.log('Formulaire valide → Inscription...');
+    setLoading(true);
+    try {
+      await login(email, password);
+      Toast.show({
+        type: 'success',
+        text1: 'Connexion réussie',
+        text2: 'Bienvenue !',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || 'Veuillez réessayer';
+      Toast.show({
+        type: 'error',
+        text1: 'Échec de la connexion',
+        text2: errorMessage,
+        position: 'top',
+        visibilityTime: 8000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,26 +70,36 @@ export default function LoginForm() {
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
+        disabled={loading}
         error={!!errors.email}
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
       <TextInput
         label="Mot de Passe"
-        value={motDePasse}
+        value={password}
         onChangeText={setMotDePasse}
         mode="outlined"
-        secureTextEntry
+        secureTextEntry={!showPassword}
         style={styles.input}
-        error={!!errors.motDePasse}
+        disabled={loading}
+        error={!!errors.password}
+        right={
+          <TextInput.Icon
+            icon={showPassword ? 'eye-off' : 'eye'}
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
       />
-      {errors.motDePasse && (
-        <HelperText type="error">{errors.motDePasse}</HelperText>
+      {errors.password && (
+        <HelperText type="error">{errors.password}</HelperText>
       )}
 
       <Button
         mode="contained"
         onPress={handleLogin}
+        loading={loading}
+        disabled={loading}
         style={styles.continueButton}
       >
         Continuer

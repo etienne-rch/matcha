@@ -1,0 +1,9 @@
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  subscription: string;
+  personalityTestId?: string;
+  isEmailVerified?: boolean;
+}

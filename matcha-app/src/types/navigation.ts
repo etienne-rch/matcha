@@ -2,5 +2,10 @@ export type AuthStackParamList = {
   Login: undefined;
   Signin: undefined;
   ForgotPassword: undefined;
-  ResetPassword: undefined;
+  ResetPassword: { token: string };
+};
+
+export type CommonStackParamList = {
+  Home: undefined;
+  PersonalityTest: undefined;
 };

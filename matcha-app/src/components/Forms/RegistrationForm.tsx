@@ -1,85 +1,117 @@
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 
+import { useAuth } from '@/hooks/useAuth';
+import { registrationSchema } from '@/schemas/registration';
 import { styles } from '@/themes/styles';
-import { validateEmail, validatePassword } from '@/utils/validation';
+import { AuthStackParamList } from '@/types/navigation';
+import { validateZod } from '@/utils/validation';
+
+type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 export default function RegistrationForm() {
-  const [nom, setNom] = useState('');
-  const [prenom, setPrenom] = useState('');
+  const navigation = useNavigation<NavigationProp>();
+  const { register } = useAuth();
+
+  const [firstName, setFirstname] = useState('');
+  const [lastName, setLastname] = useState('');
   const [email, setEmail] = useState('');
-  const [motDePasse, setMotDePasse] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState({
-    nom: '',
-    prenom: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    motDePasse: '',
+    password: '',
   });
 
-  const validateForm = () => {
-    let valid = true;
-    let newErrors = { nom: '', prenom: '', email: '', motDePasse: '' };
+  const handleRegister = async () => {
+    const { valid, errors: zodErrors } = validateZod(registrationSchema, {
+      firstName,
+      lastName,
+      email,
+      password,
+    });
 
-    if (!nom.trim()) {
-      newErrors.nom = 'Le nom est requis';
-      valid = false;
-    }
+    setErrors({
+      firstName: zodErrors.firstName || '',
+      lastName: zodErrors.lastName || '',
+      email: zodErrors.email || '',
+      password: zodErrors.password || '',
+    });
 
-    if (!prenom.trim()) {
-      newErrors.prenom = 'Le prénom est requis';
-      valid = false;
-    }
+    if (!valid) return;
 
-    if (!email.trim()) {
-      newErrors.email = 'L’email est requis';
-      valid = false;
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Format d’email invalide';
-      valid = false;
-    }
+    setLoading(true);
+    try {
+      await register({ email, password, firstName, lastName });
 
-    if (!motDePasse.trim()) {
-      newErrors.motDePasse = 'Le mot de passe est requis';
-      valid = false;
-    } else if (!validatePassword(motDePasse)) {
-      newErrors.motDePasse =
-        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
-      valid = false;
-    }
+      Toast.show({
+        type: 'success',
+        text1: 'Inscription réussie',
+        text2: 'Vérifiez votre email pour confirmer votre compte',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
 
-    setErrors(newErrors);
-    return valid;
-  };
+      setFirstname('');
+      setLastname('');
+      setEmail('');
+      setPassword('');
 
-  const handleRegister = () => {
-    if (validateForm()) {
-      console.log('Formulaire valide → Inscription...');
+      // Redirection vers l'écran de connexion après un court délai
+      setTimeout(() => navigation.navigate('Login'), 1000);
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: "Échec de l'inscription",
+        text2: 'Veuillez réessayer',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.inputContainer}>
       <TextInput
-        label="Nom"
-        value={nom}
-        onChangeText={setNom}
+        label="Prénom"
+        value={firstName}
+        onChangeText={setFirstname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.nom}
+        disabled={loading}
+        error={!!errors.firstName}
       />
-      {errors.nom && <HelperText type="error">{errors.nom}</HelperText>}
+      {errors.firstName && (
+        <HelperText type="error">{errors.firstName}</HelperText>
+      )}
 
       <TextInput
-        label="Prénom"
-        value={prenom}
-        onChangeText={setPrenom}
+        label="Nom"
+        value={lastName}
+        onChangeText={setLastname}
         mode="outlined"
         style={styles.input}
-        error={!!errors.prenom}
+        disabled={loading}
+        error={!!errors.lastName}
       />
-      {errors.prenom && <HelperText type="error">{errors.prenom}</HelperText>}
+      {errors.lastName && (
+        <HelperText type="error">{errors.lastName}</HelperText>
+      )}
 
       <TextInput
         label="Email"
@@ -89,26 +121,36 @@ export default function RegistrationForm() {
         keyboardType="email-address"
         autoCapitalize="none"
         style={styles.input}
+        disabled={loading}
         error={!!errors.email}
       />
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
       <TextInput
         label="Mot de Passe"
-        value={motDePasse}
-        onChangeText={setMotDePasse}
+        value={password}
+        onChangeText={setPassword}
         mode="outlined"
-        secureTextEntry
+        secureTextEntry={!showPassword}
         style={styles.input}
-        error={!!errors.motDePasse}
+        disabled={loading}
+        error={!!errors.password}
+        right={
+          <TextInput.Icon
+            icon={showPassword ? 'eye-off' : 'eye'}
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
       />
-      {errors.motDePasse && (
-        <HelperText type="error">{errors.motDePasse}</HelperText>
+      {errors.password && (
+        <HelperText type="error">{errors.password}</HelperText>
       )}
 
       <Button
         mode="contained"
         onPress={handleRegister}
+        loading={loading}
+        disabled={loading}
         style={styles.continueButton}
       >
         Continuer

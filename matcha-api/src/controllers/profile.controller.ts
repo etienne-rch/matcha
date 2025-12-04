@@ -95,8 +95,57 @@ export const getProfile = async (
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Profil "de base"
     const profile: UserProfile = mapUserToProfile(user);
-    res.status(200).json({ user: profile });
+
+    type PersonalitySummary = {
+      type: string;
+      label: string;
+      description: string | null;
+      strengths: string[];
+      weaknesses: string[];
+      recommendedJobs: string[];
+      scoreBreakdown: {
+        EI: number;
+        SN: number;
+        TF: number;
+        JP: number;
+      };
+      testId: string;
+    };
+
+    let personality: PersonalitySummary | null = null;
+
+    if (user.personalityTestId) {
+      const test = await PersonalityTest.findById(
+        user.personalityTestId,
+      ).lean();
+
+      if (test) {
+        personality = {
+          type: test.type,
+          label: test.result,
+          description: test.description ?? null,
+          strengths: test.traits ?? test.traits ?? [],
+          weaknesses: test.weaknesses ?? [],
+          recommendedJobs: test.motivationProfile ?? [],
+          scoreBreakdown: {
+            EI: test.scoreBreakdown?.EI ?? 0,
+            SN: test.scoreBreakdown?.SN ?? 0,
+            TF: test.scoreBreakdown?.TF ?? 0,
+            JP: test.scoreBreakdown?.JP ?? 0,
+          },
+          testId: test._id.toString(),
+        };
+      }
+    }
+
+    return res.status(200).json({
+      user: {
+        ...profile,
+        personality,
+      },
+    });
   } catch (error) {
     next(error);
   }

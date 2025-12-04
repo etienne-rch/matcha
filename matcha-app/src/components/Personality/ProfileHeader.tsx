@@ -17,7 +17,7 @@ export default function ProfileHeader({
     <>
       {showLogo && (
         <View style={styles.logoContainer}>
-          <Branding.Logo width={100} height={30} />
+          <Branding.Logo width={110} height={34} />
         </View>
       )}
       <View style={styles.profileHeader}>
@@ -30,39 +30,36 @@ export default function ProfileHeader({
 
 const styles = StyleSheet.create({
   logoContainer: {
-    paddingVertical: 20,
-    paddingTop: 60,
+    paddingTop: 40,
+    paddingBottom: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  header: {
-    backgroundColor: Colors.background,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.greyDark.normal,
-    textAlign: 'center',
-  },
   profileHeader: {
-    backgroundColor: Colors.background,
-    paddingVertical: 30,
+    backgroundColor: 'rgba(255,255,255,0.97)',
+    paddingVertical: 24,
     paddingHorizontal: 20,
     alignItems: 'center',
+    marginHorizontal: 20,
     marginBottom: 20,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
   profileTitle: {
-    fontSize: 28,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.greyDark.normal,
-    textAlign: 'center',
-    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   profileLabel: {
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 26,
+    fontWeight: '800',
     color: Colors.orange.normal,
     textAlign: 'center',
   },

@@ -29,14 +29,15 @@ export default function RadarChart({
     grid: Colors.greyLight.divider,
   },
 }: RadarChartProps) {
+  const padding = 26;
   const centerX = size / 2;
   const centerY = size / 2;
-  const radius = (size / 2) * 0.7;
+  const radius = (size / 2 - padding) * 0.75;
   const levels = 5;
   const sides = data.length;
 
-  const getPoints = (level: number) => {
-    return Array.from({ length: sides }, (_, i) => {
+  const getPoints = (level: number) =>
+    Array.from({ length: sides }, (_, i) => {
       const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
       const r = (radius * level) / levels;
       return {
@@ -44,7 +45,6 @@ export default function RadarChart({
         y: centerY + r * Math.sin(angle),
       };
     });
-  };
 
   const dataPoints = data.map((item, i) => {
     const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
@@ -57,7 +57,7 @@ export default function RadarChart({
 
   const labelPoints = Array.from({ length: sides }, (_, i) => {
     const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
-    const r = radius + 30;
+    const r = radius + 30; // espace label autour du chart
     return {
       x: centerX + r * Math.cos(angle),
       y: centerY + r * Math.sin(angle),
@@ -67,6 +67,7 @@ export default function RadarChart({
 
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Grille */}
       {Array.from({ length: levels }, (_, level) => {
         const points = getPoints(level + 1);
         return (
@@ -80,6 +81,7 @@ export default function RadarChart({
         );
       })}
 
+      {/* Axes */}
       {labelPoints.map((point, i) => (
         <Line
           key={i}
@@ -92,6 +94,7 @@ export default function RadarChart({
         />
       ))}
 
+      {/* Données */}
       <Polygon
         points={dataPoints.map((p) => `${p.x},${p.y}`).join(' ')}
         fill={colors.fill}
@@ -100,17 +103,17 @@ export default function RadarChart({
         strokeWidth="2"
       />
 
-      {labelPoints.map((point, i) => (
+      {/* Labels */}
+      {labelPoints.map((p, i) => (
         <SvgText
           key={i}
-          x={point.x}
-          y={point.y}
-          fontSize="12"
+          x={p.x}
+          y={p.y}
+          fontSize="13"
           fill={Colors.greyDark.normal}
           textAnchor="middle"
-          alignmentBaseline="middle"
         >
-          {point.label}
+          {p.label}
         </SvgText>
       ))}
     </Svg>

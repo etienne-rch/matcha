@@ -3,13 +3,16 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useRef } from 'react';
 import {
   Animated,
-  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { resetPersonalityTest } from '@/api/personality';
+import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import {
   FloatingActionButton,
   ProfileHeader,
@@ -35,12 +38,12 @@ export default function PersonalityResultScreen() {
   const { result } = route.params;
 
   const scrollY = useRef(new Animated.Value(0)).current;
-  const progressAnim = useRef(new Animated.Value(0)).current;
+  const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(progressAnim, {
+    Animated.timing(anim, {
       toValue: 1,
-      duration: 1000,
+      duration: 900,
       useNativeDriver: false,
     }).start();
   }, []);
@@ -64,40 +67,50 @@ export default function PersonalityResultScreen() {
     navigation.navigate('HomeMain');
   };
 
+  const handleRedoTest = async () => {
+    await resetPersonalityTest(); // appel API
+    await refreshUser();
+    navigation.navigate('PersonalityTest');
+  };
+
   return (
-    <ImageBackground
-      source={require('@/assets/backgrounds/default.jpg')}
-      style={styles.background}
-      resizeMode="cover"
-    >
+    <BackgroundRadial>
+      <SafeAreaView style={styles.safeArea} />
+
       <View style={styles.container}>
         <ScrollView
-          style={styles.scrollView}
+          style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
+          scrollEventThrottle={16}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: false },
           )}
-          scrollEventThrottle={16}
         >
-          <ProfileHeader label={result.label} showLogo />
+          {/* HEADER */}
+          <ProfileHeader label={result.label} showLogo={false} />
 
-          <View style={styles.chartContainer}>
-            <RadarChart data={radarData} />
+          {/* RADAR CHART */}
+          <View style={styles.card}>
+            <RadarChart data={radarData} size={280} />
           </View>
 
+          {/* DESCRIPTION */}
           <ProfileSection title="Description">
             <Text style={styles.description}>{result.description}</Text>
           </ProfileSection>
 
+          {/* FORCES */}
           <ProfileSection title="Forces">
             <TagList items={result.strengths} variant="success" />
           </ProfileSection>
 
+          {/* FAIBLESSES */}
           <ProfileSection title="Points d'attention">
             <TagList items={result.weaknesses} variant="warning" />
           </ProfileSection>
 
+          {/* METIERS */}
           <ProfileSection title="Métiers recommandés" isLast>
             <View style={styles.jobsList}>
               {result.recommendedJobs.map((job, i) => (
@@ -108,32 +121,57 @@ export default function PersonalityResultScreen() {
               ))}
             </View>
           </ProfileSection>
+
+          <View style={{ height: 40 }} />
+
+          <TouchableOpacity style={styles.redoButton} onPress={handleRedoTest}>
+            <Text style={styles.redoButtonText}>Refaire le test</Text>
+          </TouchableOpacity>
         </ScrollView>
 
+        {/* BOUTON FINAL */}
         <FloatingActionButton scrollY={scrollY} onPress={handleContinue} />
       </View>
-    </ImageBackground>
+    </BackgroundRadial>
   );
 }
 
 const styles = StyleSheet.create({
-  background: { flex: 1 },
-  container: { flex: 1 },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingBottom: 120 },
-  chartContainer: {
+  safeArea: {
+    backgroundColor: 'transparent',
+  },
+  container: {
+    flex: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+
+  card: {
     backgroundColor: Colors.background,
     paddingVertical: 30,
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.greyLight.divider,
+    marginBottom: 20,
+    marginHorizontal: 16,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
+
   description: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 22,
     color: Colors.greyDark.normal,
   },
-  jobsList: { gap: 12 },
+
+  jobsList: {
+    gap: 14,
+  },
   jobItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -148,5 +186,25 @@ const styles = StyleSheet.create({
   jobText: {
     fontSize: 16,
     color: Colors.greyDark.normal,
+  },
+  redoButton: {
+    backgroundColor: Colors.orange.normal,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 14,
+    alignSelf: 'center',
+    marginBottom: 40,
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  redoButtonText: {
+    color: Colors.background,
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });

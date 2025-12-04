@@ -10,6 +10,7 @@ interface AnswerButtonProps {
   isSelected: boolean;
   onPress: () => void;
 }
+
 export default function AnswerButton({
   index,
   totalOptions,
@@ -19,11 +20,13 @@ export default function AnswerButton({
   const middleIndex = (totalOptions - 1) / 2;
   const distanceFromMiddle = Math.abs(index - middleIndex);
 
-  const sizeScale = 0.7 + (distanceFromMiddle / middleIndex) * 0.6;
-  const circleSize = 32 * sizeScale;
+  const sizeScale = 0.8 + (distanceFromMiddle / middleIndex) * 0.4;
+  const circleSize = 30 * sizeScale;
 
-  let circleColor = Colors.greyLight.normal;
-  let borderColor = Colors.greyLight.dark.normal;
+  // Base neutre
+  let circleColor = 'rgba(255,255,255,0.9)';
+  let borderColor = 'rgba(0,0,0,0.06)';
+
   if (isSelected) {
     if (index < 2) {
       circleColor = Colors.orange.light.normal;
@@ -36,8 +39,13 @@ export default function AnswerButton({
       borderColor = Colors.greenLight.dark.normal;
     }
   }
+
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       <View
         style={[
           styles.circle,
@@ -46,18 +54,24 @@ export default function AnswerButton({
             height: circleSize,
             borderRadius: circleSize / 2,
             backgroundColor: circleColor,
-            borderColor: borderColor,
+            borderColor,
+            shadowOpacity: isSelected ? 0.25 : 0.08,
           },
         ]}
       />
     </TouchableOpacity>
   );
 }
+
 const styles = StyleSheet.create({
   button: {
     padding: 8,
   },
   circle: {
     borderWidth: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
 });

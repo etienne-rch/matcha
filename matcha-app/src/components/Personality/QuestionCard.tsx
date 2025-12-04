@@ -27,7 +27,10 @@ export default function QuestionCard({
 }: QuestionCardProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.questionNumber}>Question {questionNumber}</Text>
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>Question {questionNumber}</Text>
+      </View>
+
       <Text style={styles.questionText}>{questionText}</Text>
 
       <View style={styles.optionsWrapper}>
@@ -54,29 +57,36 @@ export default function QuestionCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background,
-    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.98)',
+    borderRadius: 20,
     padding: 20,
     marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 7,
     elevation: 3,
   },
-  questionNumber: {
-    fontSize: 12,
+  badge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(10,41,22,0.06)',
+    marginBottom: 10,
+  },
+  badgeText: {
+    fontSize: 11,
     fontWeight: '600',
-    color: Colors.orange.normal,
+    color: Colors.greenDark.normal,
     textTransform: 'uppercase',
-    marginBottom: 8,
-    letterSpacing: 0.5,
+    letterSpacing: 0.7,
   },
   questionText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '600',
-    color: Colors.primary,
-    marginBottom: 24,
+    color: '#062314',
+    marginBottom: 22,
     lineHeight: 24,
   },
   optionsWrapper: {
@@ -86,18 +96,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
   },
   labelsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
     marginTop: 8,
   },
   labelText: {
     fontSize: 12,
     color: Colors.greyDark.normal,
-    fontStyle: 'italic',
     maxWidth: '45%',
+    fontStyle: 'italic',
   },
 });

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { useAuth } from '@/hooks/useAuth';
 import { loginSchema } from '@/schemas/login';
-import { styles } from '@/themes/styles';
 import { validateZod } from '@/utils/validation';
 
 export default function LoginForm() {
@@ -37,7 +36,7 @@ export default function LoginForm() {
       Toast.show({
         type: 'success',
         text1: 'Connexion réussie',
-        text2: 'Bienvenue !',
+        text2: 'Bienvenue.',
         position: 'top',
         visibilityTime: 5000,
         autoHide: true,
@@ -45,7 +44,7 @@ export default function LoginForm() {
       });
     } catch (error: any) {
       const errorMessage =
-        error?.response?.data?.message || 'Veuillez réessayer';
+        error?.response?.data?.message || 'Veuillez réessayer.';
       Toast.show({
         type: 'error',
         text1: 'Échec de la connexion',
@@ -76,7 +75,7 @@ export default function LoginForm() {
       {errors.email && <HelperText type="error">{errors.email}</HelperText>}
 
       <TextInput
-        label="Mot de Passe"
+        label="Mot de passe"
         value={password}
         onChangeText={setMotDePasse}
         mode="outlined"
@@ -107,3 +106,17 @@ export default function LoginForm() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  input: {
+    marginBottom: 8,
+  },
+  continueButton: {
+    marginTop: 12,
+    borderRadius: 12,
+  },
+});

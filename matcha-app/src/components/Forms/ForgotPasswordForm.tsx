@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button, HelperText, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import { requestPasswordReset } from '@/api/auth';
 import { forgotPasswordSchema } from '@/schemas/forgot-password';
-import { styles } from '@/themes/styles';
 import { validateZod } from '@/utils/validation';
 
 import { ForgotPasswordFormProps } from './types';
@@ -19,6 +18,7 @@ export default function ForgotPasswordForm({
 
   const handleSubmit = async () => {
     const { valid, errors } = validateZod(forgotPasswordSchema, { email });
+
     if (!valid) {
       setError(errors.email);
       return;
@@ -31,26 +31,19 @@ export default function ForgotPasswordForm({
       await requestPasswordReset(email);
 
       setSent(true);
+
       Toast.show({
         type: 'success',
         text1: 'Email envoyé',
-        text2: 'Vérifiez votre boîte de réception',
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
+        text2: 'Vérifiez votre boîte de réception.',
       });
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage =
-        (err as any)?.response?.data?.message || 'Veuillez réessayer';
+        err?.response?.data?.message || 'Veuillez réessayer.';
       Toast.show({
         type: 'error',
         text1: "Échec de l'envoi",
         text2: errorMessage,
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
       });
     } finally {
       setLoading(false);
@@ -70,6 +63,7 @@ export default function ForgotPasswordForm({
         disabled={loading}
         error={!!error}
       />
+
       {error && <HelperText type="error">{error}</HelperText>}
 
       <Button
@@ -84,3 +78,17 @@ export default function ForgotPasswordForm({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  input: {
+    marginBottom: 8,
+  },
+  continueButton: {
+    marginTop: 12,
+    borderRadius: 12,
+  },
+});

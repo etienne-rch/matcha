@@ -1,17 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { ImageBackground, ScrollView, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Branding } from '@/assets';
-import GoogleAuth from '@/components/Auth/GoogleAuth';
 import LoginLink from '@/components/Auth/LoginLink';
 import SigninLink from '@/components/Auth/SigninLink';
-import TextDivider from '@/components/Divider/TextDivider';
+import BackgroundBubbles from '@/components/Background/BackgroundBubbles';
+import BackgroundRadial from '@/components/Background/BackgroundRadial';
 import ForgotPasswordForm from '@/components/Forms/ForgotPasswordForm';
-import { styles } from '@/themes/styles';
 import { AuthStackParamList } from '@/types/navigation';
 
 export default function ForgotPasswordScreen() {
@@ -22,84 +21,78 @@ export default function ForgotPasswordScreen() {
 
   const handleTokenSubmit = () => {
     if (token.trim()) {
-      // Extraire le token si l'utilisateur a collé le lien complet
       let cleanToken = token.trim();
       const tokenMatch = cleanToken.match(/token=([^&\s]+)/);
-      if (tokenMatch) {
-        cleanToken = tokenMatch[1];
-      }
+      if (tokenMatch) cleanToken = tokenMatch[1];
+
       navigation.navigate('ResetPassword', { token: cleanToken });
     }
   };
 
   return (
-    <ImageBackground
-      source={require('@/assets/backgrounds/default.jpg')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.safeAreaView}>
+    <BackgroundRadial>
+      <View style={styles.bubblesLayer} pointerEvents="none">
+        <BackgroundBubbles />
+      </View>
+
+      <SafeAreaView style={styles.safeArea}>
         <ScrollView
-          style={styles.container}
+          style={styles.scroll}
           contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
         >
-          <Branding.Logo />
-          <View style={styles.formContainer}>
-            <Text variant="headlineMedium" style={styles.title}>
-              Mot de passe oublié
-            </Text>
-            {sent ? (
+          <View style={styles.logoContainer}>
+            <Branding.Logo />
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.title}>Mot de passe oublié</Text>
+
+            {!sent ? (
+              <ForgotPasswordForm setSent={setSent} />
+            ) : (
               <View>
-                <Text style={{ marginBottom: 20 }}>
+                <Text style={styles.infoText}>
                   Si cet email existe, un lien de réinitialisation a été envoyé.
                 </Text>
-                <Text style={{ marginBottom: 10, marginTop: 10 }}>
-                  Mode test : Coller le token ici
+
+                {/* Mode test */}
+                <Text style={styles.subLabel}>
+                  Mode test : collez le token ici
                 </Text>
-                <Text
-                  variant="bodySmall"
-                  style={{ marginBottom: 15, color: '#666' }}
-                >
-                  Ouvrez l'email, copiez le lien complet ou juste le token après
-                  "?token=" et collez-le ci-dessous.
+                <Text style={styles.helperText}>
+                  Collez l’URL ou uniquement la valeur après ?token=
                 </Text>
+
                 <TextInput
+                  mode="outlined"
                   label="Token de réinitialisation"
                   value={token}
                   onChangeText={setToken}
-                  mode="outlined"
-                  placeholder="Collez le token depuis l'email"
-                  style={styles.input}
+                  placeholder="Collez ici le token"
                   multiline
+                  style={styles.input}
                 />
+
                 <Button
                   mode="contained"
                   onPress={handleTokenSubmit}
-                  style={styles.continueButton}
                   disabled={!token.trim()}
+                  style={styles.continueButton}
                 >
-                  Continuer avec ce token
+                  Continuer
                 </Button>
+
                 <Button
                   mode="text"
                   onPress={() => setSent(false)}
-                  style={{ marginTop: 10 }}
+                  style={styles.resendButton}
                 >
                   Renvoyer un email
                 </Button>
               </View>
-            ) : (
-              <ForgotPasswordForm
-                {...{
-                  setSent,
-                }}
-              />
             )}
 
-            <TextDivider text="OU" />
-            <View style={styles.container}>
-              <GoogleAuth />
-            </View>
             <View style={styles.linksContainer}>
               <SigninLink />
               <LoginLink />
@@ -107,6 +100,78 @@ export default function ForgotPasswordScreen() {
           </View>
         </ScrollView>
       </SafeAreaView>
-    </ImageBackground>
+    </BackgroundRadial>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  scroll: { flex: 1 },
+  contentContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 32,
+    justifyContent: 'center',
+  },
+  bubblesLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+    zIndex: 5,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    zIndex: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#062314',
+    marginBottom: 12,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#444',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  subLabel: {
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 10,
+  },
+  input: {
+    marginBottom: 12,
+  },
+  continueButton: {
+    marginTop: 8,
+    borderRadius: 12,
+  },
+  resendButton: {
+    marginTop: 8,
+  },
+  linksContainer: {
+    marginTop: 16,
+    alignItems: 'center',
+    gap: 4,
+  },
+});
